@@ -43,7 +43,11 @@ const ContactForm = () => {
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           // Simulate random success/failure for demo
-          Math.random() > 0.1 ? resolve(true) : reject(new Error('Submission failed'))
+          if (Math.random() > 0.1) {
+            resolve(true)
+          } else {
+            reject(new Error('Submission failed'))
+          }
         }, 2000)
       })
 

@@ -29,7 +29,7 @@ interface VideoThumbnailProps {
   index?: number
 }
 
-const VideoThumbnail = ({ videoSrc, thumbnailSrc, alt, startTime = 0, className = "", shouldPlay = true, index }: VideoThumbnailProps) => {
+const VideoThumbnail = ({ videoSrc, startTime = 0, className = "", shouldPlay = true }: VideoThumbnailProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   // Play/pause video based on shouldPlay prop
