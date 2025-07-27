@@ -49,7 +49,7 @@ const ContactForm = () => {
 
       setIsSubmitted(true)
       reset()
-    } catch (error) {
+    } catch {
       setSubmitError('Failed to send message. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -76,7 +76,7 @@ const ContactForm = () => {
             </svg>
           </motion.div>
           <h3 className="text-2xl font-oswald font-bold text-charcoal mb-2">Message Sent!</h3>
-          <p className="text-dark-grey">Thank you for reaching out. We'll get back to you within 24 hours.</p>
+          <p className="text-dark-grey">Thank you for reaching out. We&apos;ll get back to you within 24 hours.</p>
           <button
             onClick={() => setIsSubmitted(false)}
             className="mt-6 px-6 py-3 bg-charcoal text-cream font-oswald font-medium uppercase tracking-wider text-sm hover:bg-dark-grey transition-colors duration-200"
@@ -104,7 +104,7 @@ const ContactForm = () => {
           transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
           className="text-4xl md:text-6xl font-oswald font-bold text-charcoal mb-4 uppercase"
         >
-          Let's Work Together
+          Let&apos;s Work Together
         </motion.h2>
         <motion.p
           initial={{ y: 30, opacity: 0 }}
@@ -113,7 +113,7 @@ const ContactForm = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
           className="text-lg text-dark-grey font-inter max-w-2xl mx-auto"
         >
-          Ready to bring your vision to life? Get in touch and let's discuss your next project.
+          Ready to bring your vision to life? Get in touch and let&apos;s discuss your next project.
         </motion.p>
       </div>
 
@@ -257,7 +257,7 @@ const ContactForm = () => {
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-warm-grey focus:ring-charcoal focus:border-charcoal'
             }`}
-            placeholder="What's your project about?"
+            placeholder="What&apos;s your project about?"
           />
           {errors.subject && (
             <motion.p

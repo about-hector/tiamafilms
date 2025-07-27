@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useTransform, useScroll } from 'framer-motion'
+import { motion, useTransform, MotionValue } from 'framer-motion'
 import { useRef, ReactNode } from 'react'
 
 interface StoryModuleProps {
@@ -13,7 +13,7 @@ interface StoryModuleProps {
     aspectRatio?: string
   }>
   children?: ReactNode
-  scrollProgress: any // From framer-motion useScroll
+  scrollProgress: MotionValue<number> // From framer-motion useScroll
   startRange: number // When to start fade in (0-1)
   endRange: number // When to start fade out (0-1)
   isActive: boolean // Whether this story is currently active
@@ -27,8 +27,7 @@ const StoryModule = ({
   children,
   scrollProgress,
   startRange,
-  endRange,
-  isActive
+  endRange
 }: StoryModuleProps) => {
   const containerRef = useRef<HTMLDivElement>(null)
   

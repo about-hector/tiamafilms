@@ -1,7 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
-
 const Footer = () => {
   return (
     <footer className="bg-light-grey py-16 md:py-24 px-8 md:px-16 border-t border-warm-grey/30">
@@ -15,7 +13,7 @@ const Footer = () => {
               TIAMAFILMS
             </h2>
             <p className="text-dark-grey font-inter leading-relaxed">
-              Crafting cinematic narratives for life's most precious chapters. 
+              Crafting cinematic narratives for life&apos;s most precious chapters. 
               Luxury wedding videography with unparalleled artistry and elegance.
             </p>
           </div>

@@ -55,63 +55,269 @@ const V2MasonryHero = () => {
     '/reels/mp4/Roxanna James IG Reel.mp4'
   ]
 
-  // Pre-calculate all transforms to avoid conditional hooks
-  const columnTransforms = columnConfigs.map((config, index) => ({
-    y: useTransform(() => videoPositions[index].get()),
-    scale: useTransform(() => {
-      const velocity = smoothScrollVelocity.get()
-      const maxScale = prefersReducedMotion ? 1.03 : 1.08
-      return 1 + (velocity * 1.2 * (maxScale - 1))
-    }),
-    rotateZ: useTransform(() => {
-      if (prefersReducedMotion) return 0
-      const velocity = smoothScrollVelocity.get()
-      const maxRotation = 2.5
-      const direction = config.direction
-      return direction * velocity * 3 * maxRotation
-    }),
-    opacity: useTransform(() => {
-      const currentY = videoPositions[index].get()
-      const viewportHeight = window.innerHeight
-      const cardHeight = viewportHeight * 0.6
-      const fadeZone = cardHeight * 0.4 // Fade zone size
-      const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
-      const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-      
-      // Calculate distance from wrap boundaries
-      const distanceFromTop = currentY - minBound
-      const distanceFromBottom = maxBound - currentY
-      const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-      
-      // If within fade zone, reduce opacity
-      if (minDistance < fadeZone) {
-        const fadeProgress = minDistance / fadeZone
-        return Math.max(0.2, fadeProgress) // Don't fade completely to 0
-      }
-      return 1
-    }),
-    filter: useTransform(() => {
-      const currentY = videoPositions[index].get()
-      const viewportHeight = window.innerHeight
-      const cardHeight = viewportHeight * 0.6
-      const blurZone = cardHeight * 0.3 // Blur zone size
-      const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
-      const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-      
-      // Calculate distance from wrap boundaries
-      const distanceFromTop = currentY - minBound
-      const distanceFromBottom = maxBound - currentY
-      const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-      
-      // If within blur zone, add blur
-      if (minDistance < blurZone) {
-        const blurProgress = 1 - (minDistance / blurZone)
-        const blurAmount = blurProgress * 8 // Max 8px blur
-        return `blur(${blurAmount}px)`
-      }
-      return 'blur(0px)'
-    })
-  }))
+  // Create transforms for each column explicitly to avoid hook violations
+  const columnTransforms = [
+    // Column 0
+    {
+      y: useTransform(() => videoPositions[0].get()),
+      scale: useTransform(() => {
+        const velocity = smoothScrollVelocity.get()
+        const maxScale = prefersReducedMotion ? 1.03 : 1.08
+        return 1 + (velocity * 1.2 * (maxScale - 1))
+      }),
+      rotateZ: useTransform(() => {
+        if (prefersReducedMotion) return 0
+        const velocity = smoothScrollVelocity.get()
+        const maxRotation = 2.5
+        return columnConfigs[0].direction * velocity * 3 * maxRotation
+      }),
+      opacity: useTransform(() => {
+        const currentY = videoPositions[0].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const fadeZone = cardHeight * 0.4
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < fadeZone) {
+          const fadeProgress = minDistance / fadeZone
+          return Math.max(0.2, fadeProgress)
+        }
+        return 1
+      }),
+      filter: useTransform(() => {
+        const currentY = videoPositions[0].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const blurZone = cardHeight * 0.3
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < blurZone) {
+          const blurProgress = 1 - (minDistance / blurZone)
+          const blurAmount = blurProgress * 8
+          return `blur(${blurAmount}px)`
+        }
+        return 'blur(0px)'
+      })
+    },
+    // Column 1
+    {
+      y: useTransform(() => videoPositions[1].get()),
+      scale: useTransform(() => {
+        const velocity = smoothScrollVelocity.get()
+        const maxScale = prefersReducedMotion ? 1.03 : 1.08
+        return 1 + (velocity * 1.2 * (maxScale - 1))
+      }),
+      rotateZ: useTransform(() => {
+        if (prefersReducedMotion) return 0
+        const velocity = smoothScrollVelocity.get()
+        const maxRotation = 2.5
+        return columnConfigs[1].direction * velocity * 3 * maxRotation
+      }),
+      opacity: useTransform(() => {
+        const currentY = videoPositions[1].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const fadeZone = cardHeight * 0.4
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < fadeZone) {
+          const fadeProgress = minDistance / fadeZone
+          return Math.max(0.2, fadeProgress)
+        }
+        return 1
+      }),
+      filter: useTransform(() => {
+        const currentY = videoPositions[1].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const blurZone = cardHeight * 0.3
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < blurZone) {
+          const blurProgress = 1 - (minDistance / blurZone)
+          const blurAmount = blurProgress * 8
+          return `blur(${blurAmount}px)`
+        }
+        return 'blur(0px)'
+      })
+    },
+    // Column 2
+    {
+      y: useTransform(() => videoPositions[2].get()),
+      scale: useTransform(() => {
+        const velocity = smoothScrollVelocity.get()
+        const maxScale = prefersReducedMotion ? 1.03 : 1.08
+        return 1 + (velocity * 1.2 * (maxScale - 1))
+      }),
+      rotateZ: useTransform(() => {
+        if (prefersReducedMotion) return 0
+        const velocity = smoothScrollVelocity.get()
+        const maxRotation = 2.5
+        return columnConfigs[2].direction * velocity * 3 * maxRotation
+      }),
+      opacity: useTransform(() => {
+        const currentY = videoPositions[2].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const fadeZone = cardHeight * 0.4
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < fadeZone) {
+          const fadeProgress = minDistance / fadeZone
+          return Math.max(0.2, fadeProgress)
+        }
+        return 1
+      }),
+      filter: useTransform(() => {
+        const currentY = videoPositions[2].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const blurZone = cardHeight * 0.3
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < blurZone) {
+          const blurProgress = 1 - (minDistance / blurZone)
+          const blurAmount = blurProgress * 8
+          return `blur(${blurAmount}px)`
+        }
+        return 'blur(0px)'
+      })
+    },
+    // Column 3
+    {
+      y: useTransform(() => videoPositions[3].get()),
+      scale: useTransform(() => {
+        const velocity = smoothScrollVelocity.get()
+        const maxScale = prefersReducedMotion ? 1.03 : 1.08
+        return 1 + (velocity * 1.2 * (maxScale - 1))
+      }),
+      rotateZ: useTransform(() => {
+        if (prefersReducedMotion) return 0
+        const velocity = smoothScrollVelocity.get()
+        const maxRotation = 2.5
+        return columnConfigs[3].direction * velocity * 3 * maxRotation
+      }),
+      opacity: useTransform(() => {
+        const currentY = videoPositions[3].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const fadeZone = cardHeight * 0.4
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < fadeZone) {
+          const fadeProgress = minDistance / fadeZone
+          return Math.max(0.2, fadeProgress)
+        }
+        return 1
+      }),
+      filter: useTransform(() => {
+        const currentY = videoPositions[3].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const blurZone = cardHeight * 0.3
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < blurZone) {
+          const blurProgress = 1 - (minDistance / blurZone)
+          const blurAmount = blurProgress * 8
+          return `blur(${blurAmount}px)`
+        }
+        return 'blur(0px)'
+      })
+    },
+    // Column 4
+    {
+      y: useTransform(() => videoPositions[4].get()),
+      scale: useTransform(() => {
+        const velocity = smoothScrollVelocity.get()
+        const maxScale = prefersReducedMotion ? 1.03 : 1.08
+        return 1 + (velocity * 1.2 * (maxScale - 1))
+      }),
+      rotateZ: useTransform(() => {
+        if (prefersReducedMotion) return 0
+        const velocity = smoothScrollVelocity.get()
+        const maxRotation = 2.5
+        return columnConfigs[4].direction * velocity * 3 * maxRotation
+      }),
+      opacity: useTransform(() => {
+        const currentY = videoPositions[4].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const fadeZone = cardHeight * 0.4
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < fadeZone) {
+          const fadeProgress = minDistance / fadeZone
+          return Math.max(0.2, fadeProgress)
+        }
+        return 1
+      }),
+      filter: useTransform(() => {
+        const currentY = videoPositions[4].get()
+        const viewportHeight = window.innerHeight
+        const cardHeight = viewportHeight * 0.6
+        const blurZone = cardHeight * 0.3
+        const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+        const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+        
+        const distanceFromTop = currentY - minBound
+        const distanceFromBottom = maxBound - currentY
+        const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+        
+        if (minDistance < blurZone) {
+          const blurProgress = 1 - (minDistance / blurZone)
+          const blurAmount = blurProgress * 8
+          return `blur(${blurAmount}px)`
+        }
+        return 'blur(0px)'
+      })
+    }
+  ]
 
   // Track scroll velocity for reactive animation
   useAnimationFrame((time) => {

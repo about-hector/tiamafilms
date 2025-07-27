@@ -1,10 +1,10 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionValue } from 'framer-motion'
 import { useState, useRef } from 'react'
 
-interface ModernCityWeddingProps {
-  scrollProgress: any
+interface RomanticGardenWeddingProps {
+  scrollProgress: MotionValue<number>
   startRange: number
   endRange: number
   isActive: boolean
@@ -18,7 +18,7 @@ interface VideoThumbnailProps {
   className?: string
 }
 
-const VideoThumbnail = ({ videoSrc, thumbnailSrc, alt, startTime = 0, className = "" }: VideoThumbnailProps) => {
+const VideoThumbnail = ({ videoSrc, alt, startTime = 0, className = "" }: VideoThumbnailProps) => {
   const [isHovered, setIsHovered] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -83,6 +83,11 @@ const VideoThumbnail = ({ videoSrc, thumbnailSrc, alt, startTime = 0, className 
           </div>
         </div>
       </div>
+      
+      {/* 9:16 Ratio Label */}
+      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-oswald uppercase tracking-wide px-2 py-1 rounded">
+        9:16
+      </div>
     </div>
   )
 }
@@ -109,30 +114,30 @@ const InfiniteMarquee = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-const ModernCityWedding = ({
+const RomanticGardenWedding = ({
   scrollProgress,
   startRange,
   endRange,
   isActive
-}: ModernCityWeddingProps) => {
+}: RomanticGardenWeddingProps) => {
   const videos = [
     {
-      videoSrc: "/videos/city-wedding-ceremony.mp4",
-      thumbnailSrc: "/stories/city-wedding-main.jpg",
-      alt: "Rooftop Ceremony",
-      startTime: 12
+      videoSrc: "/videos/garden-wedding-ceremony.mp4",
+      thumbnailSrc: "/stories/garden-wedding-main.jpg",
+      alt: "Ceremony Highlights",
+      startTime: 10
     },
     {
-      videoSrc: "/videos/city-wedding-details.mp4", 
-      thumbnailSrc: "/stories/city-wedding-details-1.jpg",
-      alt: "Urban Details",
-      startTime: 8
+      videoSrc: "/videos/garden-wedding-details.mp4", 
+      thumbnailSrc: "/stories/garden-wedding-details-1.jpg",
+      alt: "Wedding Details",
+      startTime: 5
     },
     {
-      videoSrc: "/videos/city-wedding-reception.mp4",
-      thumbnailSrc: "/stories/city-wedding-details-2.jpg",
-      alt: "City Lights Reception",
-      startTime: 20
+      videoSrc: "/videos/garden-wedding-reception.mp4",
+      thumbnailSrc: "/stories/garden-wedding-details-2.jpg",
+      alt: "Reception Moments",
+      startTime: 15
     }
   ]
 
@@ -149,10 +154,10 @@ const ModernCityWedding = ({
           className="text-center pt-12 pb-8"
         >
           <p className="text-sm font-oswald font-medium uppercase tracking-[0.3em] text-dark-grey mb-2">
-            NEW YORK
+            TUSCANY
           </p>
           <h3 className="text-lg font-oswald font-semibold uppercase tracking-[0.2em] text-charcoal">
-            DOWNTOWN LOFT & ROOFTOP
+            BOTANICAL GARDENS ESTATE
           </h3>
         </motion.div>
 
@@ -165,7 +170,7 @@ const ModernCityWedding = ({
         >
           <InfiniteMarquee>
             <span className="text-4xl md:text-5xl lg:text-6xl font-oswald font-bold uppercase tracking-wider text-charcoal">
-              ELENA + DAVID
+              SARAH + MICHAEL
             </span>
           </InfiniteMarquee>
         </motion.div>
@@ -209,7 +214,7 @@ const ModernCityWedding = ({
         >
           <div className="max-w-4xl mx-auto text-center">
             <blockquote className="text-lg md:text-xl text-dark-grey font-inter italic leading-relaxed mb-6">
-              "The team captured our vision perfectly - sophisticated, urban, and authentic to who we are as a couple. The city became our church."
+              &ldquo;Honestly have been sobbing happy tears all evening. Wow, you are true artists!!!!!!!!! You have made us see our wedding in a light we didn&apos;t even think possible, purely artistic, emotional, incredible. We are eternally grateful ❤️&rdquo;
             </blockquote>
             <div className="flex items-center justify-center space-x-4">
               <div className="w-8 h-px bg-warm-grey"></div>
@@ -226,4 +231,4 @@ const ModernCityWedding = ({
   )
 }
 
-export default ModernCityWedding 
+export default RomanticGardenWedding 

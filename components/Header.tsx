@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 interface HeaderProps {
   className?: string
@@ -22,9 +23,6 @@ const Header = ({ className = "" }: HeaderProps) => {
           TiamaFilms
         </h1>
         <nav className="hidden md:flex space-x-8 text-sm text-charcoal/80 font-oswald font-medium uppercase tracking-wider">
-          <a href="/" className="hover:text-charcoal transition-colors duration-200 ease-out">
-            V1
-          </a>
           <a href="#" className="hover:text-charcoal transition-colors duration-200 ease-out">
             About
           </a>
