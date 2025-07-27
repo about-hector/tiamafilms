@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
   title: "TIAMA Films - Luxury Wedding Cinematography",
   description: "Bespoke wedding cinematography for discerning couples. We craft cinematic stories that capture the poetry of your most precious moments with unparalleled artistry and elegance.",
   url: "https://tiamafilms.com",
-  ogImage: "/og-image.jpg",
+  ogImage: "/favicon.ico",
   keywords: [
     "luxury wedding videography",
     "cinematic wedding films", 

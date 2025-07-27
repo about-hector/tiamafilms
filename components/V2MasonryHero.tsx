@@ -428,14 +428,14 @@ const V2MasonryHero = () => {
     }, 16) // ~60fps decay rate
     
     return () => clearInterval(decayInterval)
-  }, [])
+  }, [smoothScrollVelocity])
 
   // Initialize video positions to their starting values
   useEffect(() => {
     videoPositions.forEach((position, index) => {
       position.set(columnConfigs[index].initialY)
     })
-  }, [])
+  }, [columnConfigs, videoPositions])
 
   // Define which columns to show based on screen size
   const getVisibleColumns = () => {
@@ -463,7 +463,6 @@ const V2MasonryHero = () => {
         {/* Container wider than screen to allow side columns to overflow */}
         <div className={`relative h-full flex ${isMobile ? 'w-full' : 'w-[125%] -left-[12.5%]'}`}>
           {visibleColumns.map((columnIndex) => {
-            const config = columnConfigs[columnIndex]
             const transforms = columnTransforms[columnIndex]
             
             return (

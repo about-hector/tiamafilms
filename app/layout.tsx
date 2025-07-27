@@ -4,6 +4,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_CONFIG.url),
   title: SITE_CONFIG.title,
   description: SITE_CONFIG.description,
   keywords: [...SITE_CONFIG.keywords],
