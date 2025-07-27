@@ -109,12 +109,7 @@ const InfiniteMarquee = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-const ModernCityWedding = ({
-  scrollProgress,
-  startRange,
-  endRange,
-  isActive
-}: ModernCityWeddingProps) => {
+const ModernCityWedding = ({}: ModernCityWeddingProps) => {
   const videos = [
     {
       videoSrc: "/videos/city-wedding-ceremony.mp4",

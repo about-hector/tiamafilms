@@ -18,9 +18,8 @@ const generateBlocks = (count: number): VideoBlock[] => {
 const MasonryStoryModule = () => {
   const [isMobile, setIsMobile] = useState(false)
   const [isAutoScrolling, setIsAutoScrolling] = useState(false)
-  const [userScrolling, setUserScrolling] = useState(false)
+  const [userScrolling] = useState(false)
   const autoScrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
-  const userScrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   
   // Create motion values for each column
   const columnScrolls = [
@@ -42,7 +41,7 @@ const MasonryStoryModule = () => {
   const scrollSpeeds = [0.5, 0.7, 0.4, 0.6]
 
   // Auto-scroll animation
-  useAnimationFrame((time) => {
+  useAnimationFrame(() => {
     if (isAutoScrolling && !userScrolling) {
       const baseSpeed = 0.015
       

@@ -435,7 +435,8 @@ const V2MasonryHero = () => {
     videoPositions.forEach((position, index) => {
       position.set(columnConfigs[index].initialY)
     })
-  }, [columnConfigs, videoPositions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Define which columns to show based on screen size
   const getVisibleColumns = () => {

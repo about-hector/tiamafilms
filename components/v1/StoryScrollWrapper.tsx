@@ -123,7 +123,6 @@ const StoryScrollWrapper = ({ children, normalContent }: StoryScrollWrapperProps
         if (!container) return
         
         // Check if we're at the very top of the last story
-        const scrollTop = container.scrollTop
         const topSentinel = topSentinelRef.current
         
         if (topSentinel) {

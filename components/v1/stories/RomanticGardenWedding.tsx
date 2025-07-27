@@ -114,12 +114,7 @@ const InfiniteMarquee = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-const RomanticGardenWedding = ({
-  scrollProgress,
-  startRange,
-  endRange,
-  isActive
-}: RomanticGardenWeddingProps) => {
+const RomanticGardenWedding = ({}: RomanticGardenWeddingProps) => {
   const videos = [
     {
       videoSrc: "/videos/garden-wedding-ceremony.mp4",

@@ -34,7 +34,7 @@ const ContactForm = () => {
     mode: 'onChange',
   })
 
-  const onSubmit = async (_data: ContactFormData) => {
+  const onSubmit = async () => {
     setIsSubmitting(true)
     setSubmitError(null)
 
