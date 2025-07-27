@@ -1,26 +1,217 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Custom styles for masonry layout */
+@media (hover: hover) and (pointer: fine) {
+  .hover-only {
+    display: flex;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (hover: none) or (pointer: coarse) {
+  .hover-only {
+    display: none !important;
+  }
 }
+
+/* Smooth scrolling and performance optimizations */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hardware acceleration for better performance */
+.motion-safe {
+  will-change: transform, opacity;
+}
+
+/* Custom focus styles for better accessibility */
+.focus-visible {
+  outline: 2px solid #D4AF37;
+  outline-offset: 2px;
+}
+
+/* Improve text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Enhanced typography for the Oswald font */
+.font-oswald {
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* Elegant text selection */
+::selection {
+  background-color: #D4AF37;
+  color: #FEFEFE;
+}
+
+/* Prevent horizontal overflow and hide scrollbars globally */
+html, body {
+  overflow-x: hidden;
+  /* Hide scrollbars across all browsers */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbars for WebKit browsers (Safari, Chrome) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure masonry grid doesn't cause layout shifts */
+.masonry-container {
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+/* Smooth card transitions */
+.masonry-card {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Optimized masonry animations following @animations.mdc guidelines */
+.masonry-hero {
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .masonry-hero {
+    transform: none !important;
+    filter: none !important;
+    transition: opacity 0.01ms !important;
+  }
+}
+
+/* Enhanced story module transitions */
+.story-module {
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+/* Smooth story transitions following the scale/fade pattern */
+.story-transition {
+  transition: transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1),
+              opacity 0.8s cubic-bezier(0.215, 0.61, 0.355, 1),
+              filter 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* Main content fade-in optimization */
+.main-content-fade {
+  will-change: opacity;
+  backface-visibility: hidden;
+}
+
+/* Optimize story module rendering */
+@media (prefers-reduced-motion: reduce) {
+  .story-module {
+    transform: none !important;
+    filter: none !important;
+    transition: opacity 0.01ms !important;
+  }
+  
+  /* Disable page content fade-in for reduced motion users */
+  .main-content-fade {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Hide scrollbars across browsers */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Story system optimizations */
+.story-wrapper {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+.story-module-content {
+  will-change: opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
+/* Optimize story transitions */
+@media (prefers-reduced-motion: reduce) {
+  .story-wrapper {
+    transform: none !important;
+    transition: opacity 0.01ms !important;
+  }
+  
+  .story-module-content {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: opacity 0.01ms !important;
+  }
+}
+
+/* Infinite marquee animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 15s linear infinite;
+}
+
+/* Seamless infinite marquee - Jhey Thompkins technique */
+@keyframes marquee-seamless {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-25% - 20rem));
+  }
+}
+
+.animate-marquee-seamless {
+  animation: marquee-seamless 20s linear infinite;
+}
+
+/* Disable marquee animation for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-seamless {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
