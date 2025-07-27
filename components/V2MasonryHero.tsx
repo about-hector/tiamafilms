@@ -37,13 +37,13 @@ const V2MasonryHero = () => {
     useMotionValue(0), // Column 5 (right - half visible)
   ]
 
-  // Different initial Y positions and scroll configs for each column - varied speeds for fashion magazine feel
+  // Different initial Y positions and scroll configs for each column - closer positions for denser layout
   const columnConfigs = [
-    { initialY: -100, speed: 0.3, direction: 1 },   // Column 1: slow and steady
-    { initialY: 50, speed: 1.2, direction: -1 },    // Column 2: fast upward movement  
-    { initialY: -150, speed: 0.7, direction: 1 },   // Column 3: medium pace down
-    { initialY: 80, speed: 0.5, direction: -1 },    // Column 4: slower upward drift
-    { initialY: -80, speed: 1.5, direction: 1 },    // Column 5: fastest downward flow
+    { initialY: -50, speed: 0.3, direction: 1 },    // Column 1: slow and steady
+    { initialY: 20, speed: 1.2, direction: -1 },    // Column 2: fast upward movement  
+    { initialY: -80, speed: 0.7, direction: 1 },    // Column 3: medium pace down
+    { initialY: 40, speed: 0.5, direction: -1 },    // Column 4: slower upward drift
+    { initialY: -30, speed: 1.5, direction: 1 },    // Column 5: fastest downward flow
   ]
 
   // Video file paths
@@ -54,6 +54,64 @@ const V2MasonryHero = () => {
     '/reels/mp4/Kirstie & Kyle Reel.mp4',
     '/reels/mp4/Roxanna James IG Reel.mp4'
   ]
+
+  // Pre-calculate all transforms to avoid conditional hooks
+  const columnTransforms = columnConfigs.map((config, index) => ({
+    y: useTransform(() => videoPositions[index].get()),
+    scale: useTransform(() => {
+      const velocity = smoothScrollVelocity.get()
+      const maxScale = prefersReducedMotion ? 1.03 : 1.08
+      return 1 + (velocity * 1.2 * (maxScale - 1))
+    }),
+    rotateZ: useTransform(() => {
+      if (prefersReducedMotion) return 0
+      const velocity = smoothScrollVelocity.get()
+      const maxRotation = 2.5
+      const direction = config.direction
+      return direction * velocity * 3 * maxRotation
+    }),
+    opacity: useTransform(() => {
+      const currentY = videoPositions[index].get()
+      const viewportHeight = window.innerHeight
+      const cardHeight = viewportHeight * 0.6
+      const fadeZone = cardHeight * 0.4 // Fade zone size
+      const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+      const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+      
+      // Calculate distance from wrap boundaries
+      const distanceFromTop = currentY - minBound
+      const distanceFromBottom = maxBound - currentY
+      const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+      
+      // If within fade zone, reduce opacity
+      if (minDistance < fadeZone) {
+        const fadeProgress = minDistance / fadeZone
+        return Math.max(0.2, fadeProgress) // Don't fade completely to 0
+      }
+      return 1
+    }),
+    filter: useTransform(() => {
+      const currentY = videoPositions[index].get()
+      const viewportHeight = window.innerHeight
+      const cardHeight = viewportHeight * 0.6
+      const blurZone = cardHeight * 0.3 // Blur zone size
+      const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
+      const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
+      
+      // Calculate distance from wrap boundaries
+      const distanceFromTop = currentY - minBound
+      const distanceFromBottom = maxBound - currentY
+      const minDistance = Math.min(distanceFromTop, distanceFromBottom)
+      
+      // If within blur zone, add blur
+      if (minDistance < blurZone) {
+        const blurProgress = 1 - (minDistance / blurZone)
+        const blurAmount = blurProgress * 8 // Max 8px blur
+        return `blur(${blurAmount}px)`
+      }
+      return 'blur(0px)'
+    })
+  }))
 
   // Track scroll velocity for reactive animation
   useAnimationFrame((time) => {
@@ -99,11 +157,12 @@ const V2MasonryHero = () => {
       const currentValue = position.get()
       const newValue = currentValue + (finalSpeed * direction)
       
-      // Infinite loop bounds - when going off screen, wrap to opposite side
+      // Infinite loop bounds - very tight wrapping for continuous feel
       const viewportHeight = window.innerHeight
       const cardHeight = viewportHeight * 0.6 // Approximate card height
-      const maxOffset = viewportHeight + cardHeight
-      const minOffset = -(viewportHeight + cardHeight)
+      const wrapBuffer = cardHeight * 0.1 // Minimal buffer for immediate wrapping
+      const maxOffset = viewportHeight * 0.3 + wrapBuffer // Wrap as soon as card starts leaving
+      const minOffset = -(viewportHeight * 0.3 + wrapBuffer)
       
       if (newValue > maxOffset) {
         // Card went off bottom, bring it back from top
@@ -172,7 +231,17 @@ const V2MasonryHero = () => {
     })
   }, [])
 
+  // Define which columns to show based on screen size
+  const getVisibleColumns = () => {
+    if (isMobile) {
+      // On mobile, show only columns 1, 2, 3 (indices 1, 2, 3)
+      return [1, 2, 3]
+    }
+    // On desktop, show all columns
+    return [0, 1, 2, 3, 4]
+  }
 
+  const visibleColumns = getVisibleColumns()
 
   return (
     <motion.div 
@@ -183,20 +252,18 @@ const V2MasonryHero = () => {
       {/* Header */}
       <Header />
 
-      {/* 5-Column Video Layout */}
+      {/* Video Layout */}
       <div className="absolute inset-0 pt-20 overflow-hidden">
         {/* Container wider than screen to allow side columns to overflow */}
-        <div className="relative w-[125%] -left-[12.5%] h-full flex">
-          {[0, 1, 2, 3, 4].map((columnIndex) => {
-            // On mobile, only show 3 middle columns
-            if (isMobile && (columnIndex === 0 || columnIndex === 4)) return null
-            
+        <div className={`relative h-full flex ${isMobile ? 'w-full' : 'w-[125%] -left-[12.5%]'}`}>
+          {visibleColumns.map((columnIndex) => {
             const config = columnConfigs[columnIndex]
+            const transforms = columnTransforms[columnIndex]
             
             return (
               <div
                 key={columnIndex}
-                className={`${isMobile ? 'flex-1' : 'flex-1'} h-full flex items-center justify-center px-2`}
+                className="flex-1 h-full flex items-center justify-center px-2"
               >
                 <motion.div
                   className="relative group cursor-pointer"
@@ -204,23 +271,11 @@ const V2MasonryHero = () => {
                     aspectRatio: '9/16',
                     width: '100%',
                     height: 'auto',
-                    y: useTransform(() => 
-                      videoPositions[columnIndex].get()
-                    ),
-                    // Add subtle scale effect based on scroll velocity for visual feedback
-                    scale: useTransform(() => {
-                      const velocity = smoothScrollVelocity.get()
-                      const maxScale = prefersReducedMotion ? 1.03 : 1.08
-                      return 1 + (velocity * 1.2 * (maxScale - 1))
-                    }),
-                    // Add subtle rotation for more dynamic feel
-                    rotateZ: useTransform(() => {
-                      if (prefersReducedMotion) return 0
-                      const velocity = smoothScrollVelocity.get()
-                      const maxRotation = 2.5
-                      const direction = config.direction
-                      return direction * velocity * 3 * maxRotation
-                    })
+                    y: transforms.y,
+                    scale: transforms.scale,
+                    rotateZ: transforms.rotateZ,
+                    opacity: transforms.opacity,
+                    filter: transforms.filter
                   }}
                   initial={{ 
                     opacity: 0, 
