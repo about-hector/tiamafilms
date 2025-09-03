@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { inter, playfair, montserrat, oswald } from "@/lib/fonts";
 import { SITE_CONFIG } from "@/lib/constants";
+import { VideoProvider } from "@/contexts/VideoContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -59,7 +60,12 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${montserrat.variable} ${oswald.variable} font-inter antialiased bg-neutral-50 text-neutral-900 overflow-x-hidden`}
       >
-        {children}
+        <VideoProvider
+          enableAutoPreload={true}
+          priorityVideoIds={['caroline-eran', 'celine-chris', 'irene-steven', 'kirstie-kyle', 'roxanna-james']}
+        >
+          {children}
+        </VideoProvider>
       </body>
     </html>
   );

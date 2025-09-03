@@ -3,10 +3,10 @@
 import { motion } from 'framer-motion'
 import { useRef, useEffect, useState, useCallback } from 'react'
 import React from 'react'
+import SharedVideo from './SharedVideo'
 
 interface VideoData {
-  videoSrc: string
-  thumbnailSrc: string
+  videoId: string
   alt: string
   startTime?: number
 }
@@ -20,8 +20,7 @@ interface V2StorySectionProps {
 }
 
 interface VideoThumbnailProps {
-  videoSrc: string
-  thumbnailSrc: string
+  videoId: string
   alt: string
   startTime?: number
   className?: string
@@ -29,31 +28,20 @@ interface VideoThumbnailProps {
   index?: number
 }
 
-const VideoThumbnail = ({ videoSrc, startTime = 0, className = "", shouldPlay = true }: VideoThumbnailProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  // Play/pause video based on shouldPlay prop
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = startTime
-      if (shouldPlay) {
-        videoRef.current.play()
-      } else {
-        videoRef.current.pause()
-      }
-    }
-  }, [shouldPlay, startTime])
-
+const VideoThumbnail = ({ videoId, startTime = 0, className = "", shouldPlay = true }: VideoThumbnailProps) => {
   return (
     <div className={`relative w-full h-full overflow-hidden bg-medium-grey shadow-lg rounded-lg ${className}`}>
-      {/* Video */}
-      <video
-        ref={videoRef}
+      <SharedVideo
+        videoId={videoId}
+        startTime={startTime}
         className="absolute inset-0 w-full h-full object-cover rounded-lg"
-        src={videoSrc}
+        playOnInView={true}
         muted
         loop
-        playsInline
+        isVisible={true}
+        onLoadComplete={() => {
+          console.debug(`Story section video ${videoId} ready`)
+        }}
       />
     </div>
   )
@@ -188,8 +176,7 @@ const V2StorySection = ({
                     style={{ aspectRatio: '9/16' }}
                   >
                     <VideoThumbnail
-                      videoSrc={video.videoSrc}
-                      thumbnailSrc={video.thumbnailSrc}
+                      videoId={video.videoId}
                       alt={video.alt}
                       startTime={video.startTime}
                       shouldPlay={true}
@@ -225,8 +212,7 @@ const V2StorySection = ({
                         data-index={index}
                       >
                         <VideoThumbnail
-                          videoSrc={video.videoSrc}
-                          thumbnailSrc={video.thumbnailSrc}
+                          videoId={video.videoId}
                           alt={video.alt}
                           startTime={video.startTime}
                           shouldPlay={index === currentVideoIndex}

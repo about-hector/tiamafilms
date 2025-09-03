@@ -41,20 +41,17 @@ export default function HomePage() {
         testimonial=""
         videos={[
           {
-            videoSrc: "/reels/mp4/Caroline Eran IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "caroline-eran",
             alt: "Ceremony Moments",
             startTime: 2
           },
           {
-            videoSrc: "/reels/mp4/Caroline Eran IG Reel.mp4", 
-            thumbnailSrc: "",
+            videoId: "caroline-eran",
             alt: "Romantic Details",
             startTime: 8
           },
           {
-            videoSrc: "/reels/mp4/Caroline Eran IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "caroline-eran",
             alt: "Reception Joy",
             startTime: 15
           }
@@ -68,20 +65,17 @@ export default function HomePage() {
         testimonial=""
         videos={[
           {
-            videoSrc: "/reels/mp4/Celine Chris IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "celine-chris",
             alt: "Castle Romance",
             startTime: 3
           },
           {
-            videoSrc: "/reels/mp4/Celine Chris IG Reel.mp4", 
-            thumbnailSrc: "",
+            videoId: "celine-chris",
             alt: "Elegant Details",
             startTime: 10
           },
           {
-            videoSrc: "/reels/mp4/Celine Chris IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "celine-chris",
             alt: "Celebration",
             startTime: 18
           }
@@ -95,20 +89,17 @@ export default function HomePage() {
         testimonial=""
         videos={[
           {
-            videoSrc: "/reels/mp4/Irene Steven Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "irene-steven",
             alt: "Lake Ceremony",
             startTime: 4
           },
           {
-            videoSrc: "/reels/mp4/Irene Steven Reel.mp4", 
-            thumbnailSrc: "",
+            videoId: "irene-steven",
             alt: "Mountain Views",
             startTime: 12
           },
           {
-            videoSrc: "/reels/mp4/Irene Steven Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "irene-steven",
             alt: "Lakeside Reception",
             startTime: 20
           }
@@ -122,20 +113,17 @@ export default function HomePage() {
         testimonial="Honestly have been sobbing happy tears all evening. Wow, you are true artists!!!!!!!!!!!! You have made us see our wedding in a light we didn't even think possible, purely artistic, emotional, incredible. We are eternally grateful ❤️"
         videos={[
           {
-            videoSrc: "/reels/mp4/Kirstie & Kyle Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "kirstie-kyle",
             alt: "Villa Ceremony",
             startTime: 5
           },
           {
-            videoSrc: "/reels/mp4/Kirstie & Kyle Reel.mp4", 
-            thumbnailSrc: "",
+            videoId: "kirstie-kyle",
             alt: "Tuscan Romance",
             startTime: 13
           },
           {
-            videoSrc: "/reels/mp4/Kirstie & Kyle Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "kirstie-kyle",
             alt: "Garden Reception",
             startTime: 22
           }
@@ -149,20 +137,17 @@ export default function HomePage() {
         testimonial="Hello Beatrice & Mattia, You caught us on our honeymoon in Africa and didn't have fast internet until recently. We just watched it! It is truly beautiful ❤️ We absolutely love it. It really captures the whole day! The edit is absolutely wonderful 😊❤️ Thank you so much"
         videos={[
           {
-            videoSrc: "/reels/mp4/Roxanna James IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "roxanna-james",
             alt: "Villa Ceremony",
             startTime: 6
           },
           {
-            videoSrc: "/reels/mp4/Roxanna James IG Reel.mp4", 
-            thumbnailSrc: "",
+            videoId: "roxanna-james",
             alt: "Florentine Gardens",
             startTime: 14
           },
           {
-            videoSrc: "/reels/mp4/Roxanna James IG Reel.mp4",
-            thumbnailSrc: "",
+            videoId: "roxanna-james",
             alt: "Villa Reception",
             startTime: 25
           }

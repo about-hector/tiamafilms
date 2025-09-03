@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useAnimationFrame, useMotionValue, useScroll, useTransform } from 'framer-motion'
 import Header from './Header'
+import SharedVideo from './SharedVideo'
+import { VIDEO_CONFIGS } from '@/lib/videoConfig'
 
 const V2MasonryHero = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -46,13 +48,13 @@ const V2MasonryHero = () => {
     { initialY: -30, speed: 1.5, direction: 1 },    // Column 5: fastest downward flow
   ]
 
-  // Video file paths
-  const videoFiles = [
-    '/reels/mp4/Caroline Eran IG Reel.mp4',
-    '/reels/mp4/Celine Chris IG Reel.mp4',
-    '/reels/mp4/Irene Steven Reel.mp4',
-    '/reels/mp4/Kirstie & Kyle Reel.mp4',
-    '/reels/mp4/Roxanna James IG Reel.mp4'
+  // Video IDs (now mapped to R2 storage via VIDEO_CONFIGS)
+  const videoIds = [
+    'caroline-eran',
+    'celine-chris',
+    'irene-steven',
+    'kirstie-kyle',
+    'roxanna-james'
   ]
 
   // Create transforms for each column explicitly to avoid hook violations
@@ -60,17 +62,8 @@ const V2MasonryHero = () => {
     // Column 0
     {
       y: useTransform(() => videoPositions[0].get()),
-      scale: useTransform(() => {
-        const velocity = smoothScrollVelocity.get()
-        const maxScale = prefersReducedMotion ? 1.03 : 1.08
-        return 1 + (velocity * 1.2 * (maxScale - 1))
-      }),
-      rotateZ: useTransform(() => {
-        if (prefersReducedMotion) return 0
-        const velocity = smoothScrollVelocity.get()
-        const maxRotation = 2.5
-        return columnConfigs[0].direction * velocity * 3 * maxRotation
-      }),
+      scale: useTransform(() => 1),
+      rotateZ: useTransform(() => 0),
       opacity: useTransform(() => {
         const currentY = videoPositions[0].get()
         const viewportHeight = window.innerHeight
@@ -112,17 +105,8 @@ const V2MasonryHero = () => {
     // Column 1
     {
       y: useTransform(() => videoPositions[1].get()),
-      scale: useTransform(() => {
-        const velocity = smoothScrollVelocity.get()
-        const maxScale = prefersReducedMotion ? 1.03 : 1.08
-        return 1 + (velocity * 1.2 * (maxScale - 1))
-      }),
-      rotateZ: useTransform(() => {
-        if (prefersReducedMotion) return 0
-        const velocity = smoothScrollVelocity.get()
-        const maxRotation = 2.5
-        return columnConfigs[1].direction * velocity * 3 * maxRotation
-      }),
+      scale: useTransform(() => 1),
+      rotateZ: useTransform(() => 0),
       opacity: useTransform(() => {
         const currentY = videoPositions[1].get()
         const viewportHeight = window.innerHeight
@@ -164,17 +148,8 @@ const V2MasonryHero = () => {
     // Column 2
     {
       y: useTransform(() => videoPositions[2].get()),
-      scale: useTransform(() => {
-        const velocity = smoothScrollVelocity.get()
-        const maxScale = prefersReducedMotion ? 1.03 : 1.08
-        return 1 + (velocity * 1.2 * (maxScale - 1))
-      }),
-      rotateZ: useTransform(() => {
-        if (prefersReducedMotion) return 0
-        const velocity = smoothScrollVelocity.get()
-        const maxRotation = 2.5
-        return columnConfigs[2].direction * velocity * 3 * maxRotation
-      }),
+      scale: useTransform(() => 1),
+      rotateZ: useTransform(() => 0),
       opacity: useTransform(() => {
         const currentY = videoPositions[2].get()
         const viewportHeight = window.innerHeight
@@ -216,17 +191,8 @@ const V2MasonryHero = () => {
     // Column 3
     {
       y: useTransform(() => videoPositions[3].get()),
-      scale: useTransform(() => {
-        const velocity = smoothScrollVelocity.get()
-        const maxScale = prefersReducedMotion ? 1.03 : 1.08
-        return 1 + (velocity * 1.2 * (maxScale - 1))
-      }),
-      rotateZ: useTransform(() => {
-        if (prefersReducedMotion) return 0
-        const velocity = smoothScrollVelocity.get()
-        const maxRotation = 2.5
-        return columnConfigs[3].direction * velocity * 3 * maxRotation
-      }),
+      scale: useTransform(() => 1),
+      rotateZ: useTransform(() => 0),
       opacity: useTransform(() => {
         const currentY = videoPositions[3].get()
         const viewportHeight = window.innerHeight
@@ -268,17 +234,8 @@ const V2MasonryHero = () => {
     // Column 4
     {
       y: useTransform(() => videoPositions[4].get()),
-      scale: useTransform(() => {
-        const velocity = smoothScrollVelocity.get()
-        const maxScale = prefersReducedMotion ? 1.03 : 1.08
-        return 1 + (velocity * 1.2 * (maxScale - 1))
-      }),
-      rotateZ: useTransform(() => {
-        if (prefersReducedMotion) return 0
-        const velocity = smoothScrollVelocity.get()
-        const maxRotation = 2.5
-        return columnConfigs[4].direction * velocity * 3 * maxRotation
-      }),
+      scale: useTransform(() => 1),
+      rotateZ: useTransform(() => 0),
       opacity: useTransform(() => {
         const currentY = videoPositions[4].get()
         const viewportHeight = window.innerHeight
@@ -395,24 +352,20 @@ const V2MasonryHero = () => {
   // Check for reduced motion preference
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    
+
     const handleChange = () => {
       setPrefersReducedMotion(mediaQuery.matches)
-      
-      // Update video playback rates
-      videoRefs.current.forEach((video) => {
-        if (video) {
-          video.playbackRate = mediaQuery.matches ? 0.75 : 1
-        }
-      })
+
+      // Video playback rates are now handled by the VideoManager
+      // which automatically adjusts based on user preferences and connection
     }
-    
+
     // Set initial value
     handleChange()
-    
+
     // Listen for changes
     mediaQuery.addEventListener('change', handleChange)
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleChange)
     }
@@ -504,21 +457,17 @@ const V2MasonryHero = () => {
                 >
                   {/* Video Container */}
                   <div className="w-full h-full rounded-xl overflow-hidden shadow-medium">
-                    <video
-                      ref={(el) => {
-                        videoRefs.current[columnIndex] = el
-                        if (el) {
-                          // Set initial playback rate based on motion preference
-                          el.playbackRate = prefersReducedMotion ? 0.75 : 1
-                        }
-                      }}
-                      src={videoFiles[columnIndex]}
-                      className="w-full h-full object-cover"
+                    <SharedVideo
+                      videoId={videoIds[columnIndex]}
+                      className="w-full h-full object-cover rounded-xl"
                       autoPlay
                       muted
                       loop
-                      playsInline
-                      preload="metadata"
+                      isVisible={true}
+                      onLoadComplete={() => {
+                        // Video is ready and optimally loaded from cache
+                        console.debug(`Hero video ${videoIds[columnIndex]} ready for column ${columnIndex}`)
+                      }}
                     />
                   </div>
 
