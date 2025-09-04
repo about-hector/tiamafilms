@@ -22,7 +22,7 @@ export interface VideoState {
   startTime?: number
 }
 
-type VideoEventCallback = (videoId: string, event: string, data?: any) => void
+type VideoEventCallback = (videoId: string, event: string, data?: unknown) => void
 
 class VideoManagerClass {
   private cache: Map<string, VideoCache> = new Map()
@@ -54,7 +54,7 @@ class VideoManagerClass {
   private initializeConnectionMonitoring() {
     console.log('[VideoManager] Initializing connection monitoring')
     try {
-      // @ts-ignore - navigator.connection is not in TypeScript types but exists
+      // @ts-expect-error - navigator.connection is not in TypeScript types but exists
       const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
 
       if (connection) {
@@ -198,18 +198,19 @@ class VideoManagerClass {
       }
 
       // Create download promise
-      const loadPromise = this.downloadVideoBlob(videoUrl)
+      const loadPromise = this.downloadVideoBlob(videoUrl).then(blob => {
+        cacheEntry.blob = blob
+        cacheEntry.objectUrl = URL.createObjectURL(blob)
+        cacheEntry.isLoading = false
+        cacheEntry.isLoaded = true
+      })
       cacheEntry.loadPromise = loadPromise
 
-      const blob = await loadPromise
-      cacheEntry.blob = blob
-      cacheEntry.objectUrl = URL.createObjectURL(blob)
-      cacheEntry.isLoading = false
-      cacheEntry.isLoaded = true
+      await loadPromise
 
-      console.log('[VideoManager] Video blob successfully cached:', videoId, 'Size:', blob.size, 'bytes')
+      console.log('[VideoManager] Video blob successfully cached:', videoId, 'Size:', cacheEntry.blob?.size, 'bytes')
 
-      this.emitEvent(videoId, 'preloaded', { quality: optimalQuality, size: blob.size })
+      this.emitEvent(videoId, 'preloaded', { quality: optimalQuality, size: cacheEntry.blob?.size || 0 })
       this.manageCacheSize()
 
     } catch (error) {
@@ -296,7 +297,7 @@ class VideoManagerClass {
   public async getVideoObjectUrl(videoId: string, isVisible: boolean = true): Promise<string | null> {
     console.log('[VideoManager] getVideoObjectUrl called for:', videoId, 'isVisible:', isVisible)
 
-    let cacheEntry = this.cache.get(videoId)
+    const cacheEntry = this.cache.get(videoId)
 
     if (!cacheEntry) {
       console.log('[VideoManager] No cache entry for:', videoId, 'starting download')
@@ -338,7 +339,7 @@ class VideoManagerClass {
   }
 
   // Create a new video element with the object URL
-  public createVideoElement(objectUrl: string, config?: VideoConfig): HTMLVideoElement {
+  public createVideoElement(objectUrl: string): HTMLVideoElement {
     const video = document.createElement('video')
 
     video.src = objectUrl
@@ -394,7 +395,7 @@ class VideoManagerClass {
     }
   }
 
-  private emitEvent(videoId: string, event: string, data?: any): void {
+  private emitEvent(videoId: string, event: string, data?: unknown): void {
     this.eventCallbacks.forEach(callback => {
       try {
         callback(videoId, event, data)

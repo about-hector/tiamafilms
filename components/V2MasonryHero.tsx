@@ -4,15 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useAnimationFrame, useMotionValue, useScroll, useTransform } from 'framer-motion'
 import Header from './Header'
 import SharedVideo from './SharedVideo'
-import { VIDEO_CONFIGS } from '@/lib/videoConfig'
 
 const V2MasonryHero = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   
-  // Video refs to control playback rate
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   
   // Scroll velocity tracking for reactive animation
   const scrollVelocity = useMotionValue(0)

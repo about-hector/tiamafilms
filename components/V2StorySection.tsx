@@ -28,7 +28,7 @@ interface VideoThumbnailProps {
   index?: number
 }
 
-const VideoThumbnail = ({ videoId, startTime = 0, className = "", shouldPlay = true }: VideoThumbnailProps) => {
+const VideoThumbnail = ({ videoId, startTime = 0, className = "" }: VideoThumbnailProps) => {
   return (
     <div className={`relative w-full h-full overflow-hidden bg-medium-grey shadow-lg rounded-lg ${className}`}>
       <SharedVideo

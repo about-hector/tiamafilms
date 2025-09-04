@@ -80,7 +80,7 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
   onPause
 }, ref) => {
   const videoRef = useRef<HTMLDivElement>(null)
-  const { shouldReduceData, shouldPreload, canAffordHighQuality } = useConnectionAware()
+  const { shouldReduceData, shouldPreload } = useConnectionAware()
 
   // Use intersection observer for playOnInView
   const [inViewRef, isInView] = useInView(0.5)
@@ -244,7 +244,7 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
 
     // Start immediately, no delay
     initializeVideo()
-  }, [videoElement, shouldPlay, startTime, videoId, shouldReduceData, isVisible])
+  }, [videoElement, shouldPlay, startTime, videoId, shouldReduceData, isVisible, autoPlay])
 
   // Handle play/pause based on visibility when playOnInView is enabled
   useEffect(() => {
