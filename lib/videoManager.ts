@@ -348,8 +348,26 @@ class VideoManagerClass {
     video.playsInline = true
     video.loop = true
 
-    console.log('[VideoManager] Created video element with object URL')
+    // Critical mobile attributes for autoplay and inline playback
+    video.setAttribute('webkit-playsinline', 'true')
+    video.setAttribute('playsinline', 'true')
+    video.setAttribute('muted', 'true')
+    video.setAttribute('autoplay', 'false') // Let SharedVideo handle autoplay timing
+
+    // iOS-specific optimizations
+    if (this.isMobileDevice()) {
+      video.preload = 'metadata' // Conservative preload on mobile
+      video.setAttribute('x-webkit-airplay', 'allow')
+    }
+
+    console.log('[VideoManager] Created video element with mobile optimizations')
     return video
+  }
+
+  // Helper to detect mobile devices
+  private isMobileDevice(): boolean {
+    if (typeof window === 'undefined') return false
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   }
 
   // Cleanup old object URLs to prevent memory leaks

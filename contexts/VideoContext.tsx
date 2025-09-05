@@ -241,6 +241,18 @@ export function useVideoElement(videoId: string, isVisible: boolean = true) {
         element.muted = true
         element.playsInline = true
         element.loop = true
+
+        // Mobile-specific attributes for immediate playback
+        element.setAttribute('webkit-playsinline', 'true')
+        element.setAttribute('playsinline', 'true')
+        element.setAttribute('muted', 'true')
+
+        // iOS Safari specific optimizations
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          element.setAttribute('x-webkit-airplay', 'allow')
+          element.crossOrigin = 'anonymous'
+        }
+
         setVideoElement(element)
         setObjectUrl(directUrl)
         setIsLoading(false)

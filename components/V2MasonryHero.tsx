@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useAnimationFrame, useMotionValue, useScroll, useTransform } from 'framer-motion'
 import Header from './Header'
 import SharedVideo from './SharedVideo'
@@ -9,6 +9,7 @@ const V2MasonryHero = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [userHasInteracted, setUserHasInteracted] = useState(false)
   
   
   // Scroll velocity tracking for reactive animation
@@ -53,6 +54,16 @@ const V2MasonryHero = () => {
     'kirstie-kyle',
     'roxanna-james'
   ]
+
+  // Different start times for visual variety (in seconds)
+  const videoStartTimes = [
+    12, // caroline-eran - start 12s in
+    8,  // celine-chris - start 8s in
+    15, // irene-steven - start 15s in
+    5,  // kirstie-kyle - start 5s in
+    20  // roxanna-james - start 20s in
+  ]
+
 
   // Create transforms for each column explicitly to avoid hook violations
   const columnTransforms = [
@@ -400,11 +411,21 @@ const V2MasonryHero = () => {
 
   const visibleColumns = getVisibleColumns()
 
+  // Handle user interaction to enable video playback on mobile
+  const handleUserInteraction = useCallback(() => {
+    if (!userHasInteracted) {
+      setUserHasInteracted(true)
+      console.log('[V2MasonryHero] User interaction detected, enabling video playback')
+    }
+  }, [userHasInteracted])
+
   return (
-    <motion.div 
+    <motion.div
       ref={containerRef}
       className="relative w-full h-screen bg-white"
       style={{ opacity, scale }}
+      onClick={handleUserInteraction}
+      onTouchStart={handleUserInteraction}
     >
       {/* Header */}
       <Header />
@@ -415,7 +436,7 @@ const V2MasonryHero = () => {
         <div className={`relative h-full flex ${isMobile ? 'w-full' : 'w-[125%] -left-[12.5%]'}`}>
           {visibleColumns.map((columnIndex) => {
             const transforms = columnTransforms[columnIndex]
-            
+
             return (
               <div
                 key={columnIndex}
@@ -433,19 +454,19 @@ const V2MasonryHero = () => {
                     opacity: transforms.opacity,
                     filter: transforms.filter
                   }}
-                  initial={{ 
-                    opacity: 0, 
+                  initial={{
+                    opacity: 0,
                     scale: 0.9,
                     y: 50
                   }}
-                  animate={{ 
-                    opacity: 1, 
+                  animate={{
+                    opacity: 1,
                     scale: 1,
                     y: 0
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 0.6,
-                    ease: [0.215, 0.61, 0.355, 1], // ease-out-cubic from animations.mdc
+                    ease: [0.215, 0.61, 0.355, 1],
                     delay: 0.1 * columnIndex,
                     type: "spring",
                     stiffness: 120,
@@ -461,8 +482,8 @@ const V2MasonryHero = () => {
                       muted
                       loop
                       isVisible={true}
+                      startTime={videoStartTimes[columnIndex]}
                       onLoadComplete={() => {
-                        // Video is ready and optimally loaded from cache
                         console.debug(`Hero video ${videoIds[columnIndex]} ready for column ${columnIndex}`)
                       }}
                     />
@@ -475,7 +496,7 @@ const V2MasonryHero = () => {
                     whileHover={{ opacity: 1 }}
                     transition={{
                       duration: 0.2,
-                      ease: [0.25, 0.46, 0.45, 0.94] // ease-out-quad from animations.mdc
+                      ease: [0.25, 0.46, 0.45, 0.94]
                     }}
                   />
                 </motion.div>

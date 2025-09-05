@@ -81,6 +81,8 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
 }, ref) => {
   const videoRef = useRef<HTMLDivElement>(null)
   const { shouldReduceData, shouldPreload } = useConnectionAware()
+  const [showPlayButton, setShowPlayButton] = useState(false)
+  const [userInteracted, setUserInteracted] = useState(false)
 
   // Use intersection observer for playOnInView
   const [inViewRef, isInView] = useInView(0.5)
@@ -128,20 +130,29 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     videoElement.controls = controls
     videoElement.playsInline = true
 
-    // Append to our container
-    if (videoRef.current && !videoRef.current.contains(videoElement)) {
-      videoRef.current.innerHTML = '' // Clear any existing content
-      videoRef.current.appendChild(videoElement)
+    // Critical mobile video attributes
+    videoElement.setAttribute('webkit-playsinline', 'true')
+    videoElement.setAttribute('playsinline', 'true')
+    videoElement.setAttribute('preload', 'metadata')
+
+    // Ensure muted for autoplay compliance on mobile
+    if (autoPlay) {
+      videoElement.muted = true
+      videoElement.setAttribute('muted', 'true')
+    }
+
+    // Append to our container - use a more React-friendly approach
+    const container = videoRef.current
+    if (container && !container.contains(videoElement)) {
+      // Clear existing content
+      container.innerHTML = ''
+      container.appendChild(videoElement)
       console.log(`[SharedVideo:${videoId}] Video element appended to container`)
     }
 
-    return () => {
-      // Cleanup when component unmounts or video changes
-      if (videoRef.current && videoRef.current.contains(videoElement)) {
-        videoRef.current.removeChild(videoElement)
-      }
-    }
-  }, [videoElement, className, style, muted, loop, controls, videoId])
+    // No cleanup function - let React handle the lifecycle
+    // The video element will be cleaned up when the component unmounts
+  }, [videoElement, className, style, muted, loop, controls, videoId, autoPlay])
 
   // Handle loading states and callbacks
   useEffect(() => {
@@ -185,7 +196,7 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     }
   }, [videoElement, onTimeUpdate, onPlay, onPause])
 
-  // Handle autoplay and start time - more aggressive immediate playback
+  // Handle autoplay and start time - mobile-friendly approach
   useEffect(() => {
     console.log(`[SharedVideo:${videoId}] Autoplay effect - videoElement:`, !!videoElement, 'autoPlay:', autoPlay)
     if (!videoElement) return
@@ -199,51 +210,71 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
           videoElement.currentTime = startTime
         }
 
-        // More aggressive autoplay - start immediately if shouldPlay is true, regardless of loading state
+        // Mobile-friendly autoplay with proper error handling
         if (shouldPlay && isVisible) {
-          console.log(`[SharedVideo:${videoId}] Attempting immediate autoplay`)
+          console.log(`[SharedVideo:${videoId}] Attempting mobile-friendly autoplay`)
 
-          // Set up event listener to play as soon as we have enough data
-          const handleCanPlay = async () => {
+          // Ensure video is properly muted for mobile autoplay
+          videoElement.muted = true
+
+          const attemptAutoplay = async () => {
             try {
-              await videoElement.play()
-              console.log(`[SharedVideo:${videoId}] Autoplay successful`)
+              // Check if we have enough data to play
+              if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                await videoElement.play()
+                console.log(`[SharedVideo:${videoId}] Autoplay successful`)
+                setShowPlayButton(false) // Hide play button if autoplay works
+                return true
+              }
+              return false
             } catch (playError) {
               console.warn(`[SharedVideo:${videoId}] Auto-play failed:`, playError)
+              // On mobile, autoplay might fail - show play button for user interaction
+              if (!userInteracted) {
+                setShowPlayButton(true)
+              }
+              return false
             }
-            videoElement.removeEventListener('canplay', handleCanPlay)
           }
 
-          // If video is already ready, play immediately
-          if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            await videoElement.play()
-            console.log(`[SharedVideo:${videoId}] Immediate autoplay successful`)
-          } else {
-            // Otherwise wait for canplay event
+          // Try immediate play if ready
+          const playedImmediately = await attemptAutoplay()
+
+          if (!playedImmediately) {
+            // Set up event listener for when video can play
+            const handleCanPlay = async () => {
+              await attemptAutoplay()
+              videoElement.removeEventListener('canplay', handleCanPlay)
+            }
+
             videoElement.addEventListener('canplay', handleCanPlay)
 
-            // Also try to play immediately in case the event already fired
+            // Also try after a short delay (mobile-friendly timing)
             setTimeout(async () => {
-              if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && videoElement.paused) {
-                try {
-                  await videoElement.play()
-                  console.log(`[SharedVideo:${videoId}] Delayed autoplay successful`)
-                } catch (err) {
-                  console.warn(`[SharedVideo:${videoId}] Delayed auto-play failed:`, err)
-                }
+              if (videoElement.paused) {
+                await attemptAutoplay()
               }
-            }, 50)
+            }, 100)
+
+            // Fallback: show play button if video doesn't autoplay within 2 seconds
+            setTimeout(() => {
+              if (videoElement.paused && !userInteracted && autoPlay) {
+                console.log(`[SharedVideo:${videoId}] Autoplay timeout, showing play button`)
+                setShowPlayButton(true)
+              }
+            }, 2000)
           }
         } else {
           console.log(`[SharedVideo:${videoId}] Skipping autoplay - shouldPlay:`, shouldPlay, 'isVisible:', isVisible)
         }
-      } catch (playError) {
-        console.warn(`[SharedVideo:${videoId}] Auto-play initialization failed:`, playError)
+      } catch (initError) {
+        console.warn(`[SharedVideo:${videoId}] Video initialization failed:`, initError)
       }
     }
 
-    // Start immediately, no delay
-    initializeVideo()
+    // Small delay to ensure DOM is ready (important for mobile)
+    const timeout = setTimeout(initializeVideo, 16)
+    return () => clearTimeout(timeout)
   }, [videoElement, shouldPlay, startTime, videoId, shouldReduceData, isVisible, autoPlay])
 
   // Handle play/pause based on visibility when playOnInView is enabled
@@ -306,6 +337,21 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     }
   }), [videoElement, videoPlay, videoPause, videoSetTime, videoSetRate, startTime])
 
+  // Handle user interaction to play video when autoplay fails
+  const handleUserPlay = useCallback(async () => {
+    if (!videoElement) return
+
+    try {
+      setUserInteracted(true)
+      setShowPlayButton(false)
+      await videoElement.play()
+      console.log(`[SharedVideo:${videoId}] User-initiated play successful`)
+    } catch (error) {
+      console.error(`[SharedVideo:${videoId}] User play failed:`, error)
+      setShowPlayButton(true) // Show button again if play still fails
+    }
+  }, [videoElement, videoId])
+
   // Render loading or error states
   if (isLoading) {
     return (
@@ -348,6 +394,25 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
       {!videoElement && isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-medium-grey">
           <div className="w-8 h-8 border-2 border-charcoal/20 border-t-charcoal rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Play button overlay for when autoplay fails on mobile */}
+      {showPlayButton && videoElement && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
+          <button
+            onClick={handleUserPlay}
+            className="flex items-center justify-center w-16 h-16 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            aria-label="Play video"
+          >
+            <svg
+              className="w-6 h-6 ml-1 text-charcoal"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
