@@ -15,6 +15,7 @@ export interface VideoConfig {
   }
   duration: number // in seconds
   aspectRatio: string
+  posterTime?: number // time in seconds to use for poster/thumbnail
 }
 
 // Cloudflare R2 base URL - videos.tiamafilms.com
@@ -45,7 +46,8 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
       }
     },
     duration: 30,
-    aspectRatio: '9/16'
+    aspectRatio: '9/16',
+    posterTime: 12
   },
   {
     id: 'celine-chris',
@@ -71,7 +73,8 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
       }
     },
     duration: 32,
-    aspectRatio: '9/16'
+    aspectRatio: '9/16',
+    posterTime: 8
   },
   {
     id: 'irene-steven',
@@ -97,7 +100,8 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
       }
     },
     duration: 35,
-    aspectRatio: '9/16'
+    aspectRatio: '9/16',
+    posterTime: 15
   },
   {
     id: 'kirstie-kyle',
@@ -123,7 +127,8 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
       }
     },
     duration: 28,
-    aspectRatio: '9/16'
+    aspectRatio: '9/16',
+    posterTime: 5
   },
   {
     id: 'roxanna-james',
@@ -149,7 +154,8 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
       }
     },
     duration: 33,
-    aspectRatio: '9/16'
+    aspectRatio: '9/16',
+    posterTime: 20
   }
 ]
 

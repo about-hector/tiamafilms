@@ -43,3 +43,5 @@ next-env.d.ts
 # Large video files
 *.mov
 public/reels/*.mov
+
+certificates

@@ -10,6 +10,13 @@ const V2MasonryHero = () => {
   const [isMobile, setIsMobile] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [userHasInteracted, setUserHasInteracted] = useState(false)
+
+  // Refs for each mobile card to get actual positions
+  const mobileCardRefs = useRef<Array<Array<HTMLDivElement | null>>>([
+    [null, null, null, null, null], // Column 1 cards
+    [null, null, null, null, null], // Column 2 cards
+    [null, null, null, null, null], // Column 3 cards
+  ])
   
   
   // Scroll velocity tracking for reactive animation
@@ -37,6 +44,30 @@ const V2MasonryHero = () => {
     useMotionValue(0), // Column 5 (right - half visible)
   ]
 
+  // Motion values for blur amounts for each card in mobile columns
+  const mobileBlurValues = [
+    [useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0)], // Column 1 (index 1)
+    [useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0)], // Column 2 (index 2)
+    [useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0), useMotionValue(0)], // Column 3 (index 3)
+  ]
+
+  // Motion values for opacity amounts for each card in mobile columns
+  const mobileOpacityValues = [
+    [useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1)], // Column 1 (index 1)
+    [useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1)], // Column 2 (index 2)
+    [useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1)], // Column 3 (index 3)
+  ]
+
+  // Create blur transforms for each mobile card
+  const mobileBlurTransforms = mobileBlurValues.map(column =>
+    column.map(blurValue =>
+      useTransform(blurValue, (blur) => `blur(${blur}px)`)
+    )
+  )
+
+  // Create opacity transforms for each mobile card (no transform needed, use motion values directly)
+  const mobileOpacityTransforms = mobileOpacityValues
+
   // Different initial Y positions and scroll configs for each column - closer positions for denser layout
   const columnConfigs = [
     { initialY: -50, speed: 0.3, direction: 1 },    // Column 1: slow and steady
@@ -63,6 +94,51 @@ const V2MasonryHero = () => {
     5,  // kirstie-kyle - start 5s in
     20  // roxanna-james - start 20s in
   ]
+
+  // Create multiple videos per column for mobile with position-based blur and scattered start times
+  const getMobileColumnVideos = (columnIndex: number) => {
+    // Add variation to start times to avoid repetitive look - much larger delta for variety
+    const getVariedStartTime = (baseStartTime: number, videoIndex: number, columnIndex: number) => {
+      // Much larger variation: 0-60 seconds spread across videos and columns
+      const variation = (videoIndex * 15 + columnIndex * 20) % 60 // 0-59 seconds variation
+      return Math.max(0, baseStartTime + variation) // Ensure we don't go negative
+    }
+
+    // Use all 5 videos in each column with varied start times
+    return [
+      {
+        videoId: videoIds[0], // caroline-eran
+        startTime: getVariedStartTime(videoStartTimes[0], 0, columnIndex),
+        cardIndex: 0,
+        columnIndex
+      },
+      {
+        videoId: videoIds[1], // celine-chris
+        startTime: getVariedStartTime(videoStartTimes[1], 1, columnIndex),
+        cardIndex: 1,
+        columnIndex
+      },
+      {
+        videoId: videoIds[2], // irene-steven
+        startTime: getVariedStartTime(videoStartTimes[2], 2, columnIndex),
+        cardIndex: 2,
+        columnIndex
+      },
+      {
+        videoId: videoIds[3], // kirstie-kyle
+        startTime: getVariedStartTime(videoStartTimes[3], 3, columnIndex),
+        cardIndex: 3,
+        columnIndex
+      },
+      {
+        videoId: videoIds[4], // roxanna-james
+        startTime: getVariedStartTime(videoStartTimes[4], 4, columnIndex),
+        cardIndex: 4,
+        columnIndex
+      }
+    ]
+  }
+
 
 
   // Create transforms for each column explicitly to avoid hook violations
@@ -315,10 +391,10 @@ const V2MasonryHero = () => {
     const scrollPositionMultiplier = 1 + scrollProgress * 2 // Increased position-based acceleration
     const scrollVelocityMultiplier = 1 + smoothScrollVelocity.get() * 25 // Much stronger velocity-based boost
     const motionReduction = prefersReducedMotion ? 0.3 : 1 // More significant reduction for accessibility
-    
+
     // Add subtle randomness for fashion magazine feel
     const timeVariation = Math.sin(time * 0.0005) * 0.1 + 1
-    
+
     videoPositions.forEach((position, index) => {
       const config = columnConfigs[index]
       // Add individual variation per column for more randomness
@@ -327,24 +403,98 @@ const V2MasonryHero = () => {
       const direction = config.direction
       const currentValue = position.get()
       const newValue = currentValue + (finalSpeed * direction)
-      
+
       // Infinite loop bounds - very tight wrapping for continuous feel
       const viewportHeight = window.innerHeight
       const cardHeight = viewportHeight * 0.6 // Approximate card height
       const wrapBuffer = cardHeight * 0.1 // Minimal buffer for immediate wrapping
       const maxOffset = viewportHeight * 0.3 + wrapBuffer // Wrap as soon as card starts leaving
       const minOffset = -(viewportHeight * 0.3 + wrapBuffer)
-      
+
       if (newValue > maxOffset) {
         // Card went off bottom, bring it back from top
         position.set(minOffset)
       } else if (newValue < minOffset) {
-        // Card went off top, bring it back from bottom  
+        // Card went off top, bring it back from bottom
         position.set(maxOffset)
       } else {
         position.set(newValue)
       }
     })
+
+    // Calculate blur and opacity values for mobile columns using actual DOM positions
+    if (isMobile && containerRef.current && mobileBlurValues && mobileBlurValues.length > 0 && mobileOpacityValues && mobileOpacityValues.length > 0) {
+      const heroRect = containerRef.current.getBoundingClientRect()
+      const heroCenter = heroRect.top + (heroRect.height / 2)
+      const heroHeight = heroRect.height
+
+      // 20% clarity zone around center where cards are crystal clear
+      const clarityZone = heroHeight * 0.1 // 10% above and below center = 20% total zone
+
+      // For each visible mobile column (indices 1, 2, 3)
+      const mobileColumns = [1, 2, 3]
+      mobileColumns.forEach((columnIndex, mobileColumnIndex) => {
+        // Safety check for motion values
+        if (!videoPositions[columnIndex] || !mobileBlurValues[mobileColumnIndex] || !mobileOpacityValues[mobileColumnIndex]) {
+          return
+        }
+
+        // Check each card using actual DOM position
+        for (let cardIndex = 0; cardIndex < 5; cardIndex++) {
+          // Safety check for individual card blur and opacity values
+          if (!mobileBlurValues[mobileColumnIndex][cardIndex] || !mobileOpacityValues[mobileColumnIndex][cardIndex]) {
+            continue
+          }
+
+          // Get the actual card element position
+          const cardElement = mobileCardRefs.current[mobileColumnIndex]?.[cardIndex]
+          if (!cardElement) {
+            // If DOM element not available, skip this card
+            continue
+          }
+
+          try {
+            const cardRect = cardElement.getBoundingClientRect()
+            const cardCenter = cardRect.top + (cardRect.height / 2)
+
+            // Calculate distance from hero center
+            const distanceFromHeroCenter = Math.abs(cardCenter - heroCenter)
+
+            // Calculate blur and opacity based on distance from center
+            let blurAmount = 0
+            let opacityAmount = 1
+
+            if (distanceFromHeroCenter <= clarityZone) {
+              // Card is within 20% clarity zone - crystal clear
+              blurAmount = 0
+              opacityAmount = 1
+            } else {
+              // Card is outside clarity zone - progressive blur/fade
+              const distanceOutsideClarityZone = distanceFromHeroCenter - clarityZone
+              const maxBlurDistance = heroHeight * 0.4 // Blur reaches maximum at 40% of hero height from clarity zone
+
+              // Calculate blur (0-3px) - reduced for better video quality appearance
+              const normalizedBlurDistance = Math.min(distanceOutsideClarityZone / maxBlurDistance, 1)
+              blurAmount = normalizedBlurDistance * 3
+
+              // Calculate opacity (1.0 to 0.2) - more gradual fade
+              const maxFadeDistance = heroHeight * 0.6 // Opacity reaches minimum at 60% of hero height from clarity zone
+              const normalizedFadeDistance = Math.min(distanceOutsideClarityZone / maxFadeDistance, 1)
+              opacityAmount = Math.max(0.2, 1 - (normalizedFadeDistance * 0.8))
+            }
+
+            // Update the motion values
+            mobileBlurValues[mobileColumnIndex][cardIndex].set(blurAmount)
+            mobileOpacityValues[mobileColumnIndex][cardIndex].set(opacityAmount)
+
+          } catch (error) {
+            // If getBoundingClientRect fails, skip this card
+            console.debug('Card position calculation failed:', error)
+            continue
+          }
+        }
+      })
+    }
   })
 
   useEffect(() => {
@@ -437,71 +587,172 @@ const V2MasonryHero = () => {
           {visibleColumns.map((columnIndex) => {
             const transforms = columnTransforms[columnIndex]
 
-            return (
-              <div
-                key={columnIndex}
-                className="flex-1 h-full flex items-center justify-center px-2"
-              >
-                <motion.div
-                  className="relative group cursor-pointer"
-                  style={{
-                    aspectRatio: '9/16',
-                    width: '100%',
-                    height: 'auto',
-                    y: transforms.y,
-                    scale: transforms.scale,
-                    rotateZ: transforms.rotateZ,
-                    opacity: transforms.opacity,
-                    filter: transforms.filter
-                  }}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.9,
-                    y: 50
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    y: 0
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.215, 0.61, 0.355, 1],
-                    delay: 0.1 * columnIndex,
-                    type: "spring",
-                    stiffness: 120,
-                    damping: 25
-                  }}
+            if (isMobile) {
+              // Mobile: Show 5 videos per column
+              const mobileVideos = getMobileColumnVideos(columnIndex)
+
+              return (
+                <div
+                  key={columnIndex}
+                  className="flex-1 h-full flex flex-col justify-center px-1 space-y-2"
                 >
-                  {/* Video Container */}
-                  <div className="w-full h-full rounded-xl overflow-hidden shadow-medium">
-                    <SharedVideo
-                      videoId={videoIds[columnIndex]}
-                      className="w-full h-full object-cover rounded-xl"
-                      autoPlay
-                      muted
-                      loop
-                      isVisible={true}
-                      startTime={videoStartTimes[columnIndex]}
-                      onLoadComplete={() => {
-                        console.debug(`Hero video ${videoIds[columnIndex]} ready for column ${columnIndex}`)
+                  {mobileVideos.map((video, videoIndex) => {
+                    // Get the mobile column index (0, 1, 2 for columns 1, 2, 3)
+                    const mobileColumnIndex = [1, 2, 3].indexOf(columnIndex)
+                    const blurTransform = mobileBlurTransforms[mobileColumnIndex]?.[videoIndex]
+                    const opacityTransform = mobileOpacityTransforms[mobileColumnIndex]?.[videoIndex]
+
+                    return (
+                      <motion.div
+                        key={`${columnIndex}-${videoIndex}`}
+                        ref={(el) => {
+                          if (mobileCardRefs.current[mobileColumnIndex]) {
+                            mobileCardRefs.current[mobileColumnIndex][videoIndex] = el
+                          }
+                        }}
+                        className="relative group cursor-pointer"
+                        style={{
+                          aspectRatio: '9/16',
+                          width: '100%',
+                          height: 'auto',
+                          y: transforms.y,
+                          scale: transforms.scale,
+                          rotateZ: transforms.rotateZ,
+                          opacity: opacityTransform || 1,
+                          filter: blurTransform || 'blur(0px)'
+                        }}
+                      initial={{
+                        opacity: 0,
+                        scale: 0.9,
+                        y: 50
+                      }}
+                      animate={{
+                        opacity: 1,
+                        scale: 1,
+                        y: 0
+                      }}
+                      transition={{
+                        duration: 0.6,
+                        ease: [0.215, 0.61, 0.355, 1],
+                        delay: 0.1 * columnIndex + 0.05 * videoIndex,
+                        type: "spring",
+                        stiffness: 120,
+                        damping: 25
+                      }}
+                    >
+                      {/* Video Container */}
+                      <div
+                        className="w-full h-full rounded-xl overflow-hidden shadow-medium"
+                        onClick={handleUserInteraction}
+                        onTouchStart={handleUserInteraction}
+                      >
+                        <SharedVideo
+                          videoId={video.videoId}
+                          className="w-full h-full object-cover rounded-xl"
+                          autoPlay={true}
+                          muted
+                          loop
+                          controls={false}
+                          isVisible={true}
+                          startTime={video.startTime}
+                          showPoster={true}
+                          hidePlayButton={true}
+                          onLoadComplete={() => {
+                            console.debug(`Hero video ${video.videoId} ready for column ${columnIndex}, video ${videoIndex}`)
+                          }}
+                        />
+                      </div>
+
+                      {/* Subtle hover overlay for interactivity feedback */}
+                      <motion.div
+                        className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded-xl pointer-events-none"
+                        initial={false}
+                        whileHover={{ opacity: 1 }}
+                        transition={{
+                          duration: 0.2,
+                          ease: [0.25, 0.46, 0.45, 0.94]
+                        }}
+                      />
+                    </motion.div>
+                    )
+                  })}
+                </div>
+              )
+            } else {
+              // Desktop: Show single video per column
+              return (
+                <div
+                  key={columnIndex}
+                  className="flex-1 h-full flex items-center justify-center px-2"
+                >
+                  <motion.div
+                    className="relative group cursor-pointer"
+                    style={{
+                      aspectRatio: '9/16',
+                      width: '100%',
+                      height: 'auto',
+                      y: transforms.y,
+                      scale: transforms.scale,
+                      rotateZ: transforms.rotateZ,
+                      opacity: transforms.opacity,
+                      filter: transforms.filter
+                    }}
+                    initial={{
+                      opacity: 0,
+                      scale: 0.9,
+                      y: 50
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      y: 0
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      ease: [0.215, 0.61, 0.355, 1],
+                      delay: 0.1 * columnIndex,
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 25
+                    }}
+                  >
+                    {/* Video Container */}
+                    <div
+                      className="w-full h-full rounded-xl overflow-hidden shadow-medium"
+                      onClick={handleUserInteraction}
+                      onTouchStart={handleUserInteraction}
+                    >
+                      <SharedVideo
+                        videoId={videoIds[columnIndex]}
+                        className="w-full h-full object-cover rounded-xl"
+                        autoPlay={true}
+                        muted
+                        loop
+                        controls={false}
+                        isVisible={true}
+                        startTime={videoStartTimes[columnIndex]}
+                        showPoster={true}
+                        hidePlayButton={true}
+                        onLoadComplete={() => {
+                          console.debug(`Hero video ${videoIds[columnIndex]} ready for column ${columnIndex}`)
+                        }}
+                      />
+                    </div>
+
+                    {/* Subtle hover overlay for interactivity feedback */}
+                    <motion.div
+                      className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded-xl pointer-events-none"
+                      initial={false}
+                      whileHover={{ opacity: 1 }}
+                      transition={{
+                        duration: 0.2,
+                        ease: [0.25, 0.46, 0.45, 0.94]
                       }}
                     />
-                  </div>
-
-                  {/* Subtle hover overlay for interactivity feedback */}
-                  <motion.div
-                    className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded-xl pointer-events-none"
-                    initial={false}
-                    whileHover={{ opacity: 1 }}
-                    transition={{
-                      duration: 0.2,
-                      ease: [0.25, 0.46, 0.45, 0.94]
-                    }}
-                  />
-                </motion.div>
-              </div>
-            )
+                  </motion.div>
+                </div>
+              )
+            }
           })}
         </div>
       </div>

@@ -294,6 +294,7 @@ class VideoManagerClass {
   }
 
   // Get object URL for cached video blob (for optimized playback after preload)
+  // Returns null if blob caching fails - caller should fall back to direct URL
   public async getVideoObjectUrl(videoId: string, isVisible: boolean = true): Promise<string | null> {
     console.log('[VideoManager] getVideoObjectUrl called for:', videoId, 'isVisible:', isVisible)
 
@@ -312,6 +313,7 @@ class VideoManagerClass {
         // Don't await - start the download in background
         this.preloadVideo(videoId).catch(error => {
           console.error('[VideoManager] Background preload failed for:', videoId, error)
+          // Don't return null here - let the caller handle fallback to direct URL
         })
       }
       return null
@@ -328,9 +330,15 @@ class VideoManagerClass {
       console.log('[VideoManager] Video is loading, waiting for completion:', videoId)
       try {
         await cacheEntry.loadPromise
-        return cacheEntry.objectUrl
+        if (cacheEntry.objectUrl) {
+          return cacheEntry.objectUrl
+        } else {
+          console.warn('[VideoManager] Video load completed but no object URL available for:', videoId)
+          return null
+        }
       } catch (error) {
         console.error('[VideoManager] Failed to wait for video load:', videoId, error)
+        // Return null so caller can fall back to direct URL
         return null
       }
     }

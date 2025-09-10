@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, useCallback } from 'react'
 import { useVideoElement, useConnectionAware } from '@/contexts/VideoContext'
+import { VIDEO_CONFIGS } from '@/lib/videoConfig'
 
 // Custom hook for intersection observer
 function useInView(threshold: number = 0.5) {
@@ -43,6 +44,8 @@ export interface SharedVideoProps {
   loop?: boolean
   controls?: boolean
   isVisible?: boolean
+  showPoster?: boolean // Show poster/thumbnail while loading
+  hidePlayButton?: boolean // Hide the play button (for hero videos)
   onLoadStart?: () => void
   onLoadComplete?: () => void
   onError?: (error: string) => void
@@ -72,6 +75,8 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
   loop = true,
   controls = false,
   isVisible = true,
+  showPoster = false,
+  hidePlayButton = false,
   onLoadStart,
   onLoadComplete,
   onError,
@@ -80,9 +85,12 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
   onPause
 }, ref) => {
   const videoRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const { shouldReduceData, shouldPreload } = useConnectionAware()
   const [showPlayButton, setShowPlayButton] = useState(false)
   const [userInteracted, setUserInteracted] = useState(false)
+  const [posterUrl, setPosterUrl] = useState<string | null>(null)
+  const [showThumbnail, setShowThumbnail] = useState(showPoster)
 
   // Use intersection observer for playOnInView
   const [inViewRef, isInView] = useInView(0.5)
@@ -196,86 +204,75 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     }
   }, [videoElement, onTimeUpdate, onPlay, onPause])
 
-  // Handle autoplay and start time - mobile-friendly approach
+
+  // Handle autoplay and start time - simplified approach
   useEffect(() => {
-    console.log(`[SharedVideo:${videoId}] Autoplay effect - videoElement:`, !!videoElement, 'autoPlay:', autoPlay)
-    if (!videoElement) return
+    if (!videoElement || !shouldPlay || !isVisible) return
+
+    let isMounted = true
+    const controller = new AbortController()
 
     const initializeVideo = async () => {
-      console.log(`[SharedVideo:${videoId}] Initializing video - startTime:`, startTime, 'autoPlay:', autoPlay, 'shouldReduceData:', shouldReduceData)
       try {
-        // Set start time
-        if (startTime > 0) {
-          console.log(`[SharedVideo:${videoId}] Setting start time to:`, startTime)
-          videoElement.currentTime = startTime
+        console.log(`[SharedVideo:${videoId}] Initializing autoplay - startTime:`, startTime)
+
+        // Set start time immediately
+        videoElement.currentTime = startTime
+
+        // Ensure proper settings for autoplay
+        videoElement.muted = true
+        videoElement.playsInline = true
+
+        // Simple autoplay attempt
+        const playVideo = async () => {
+          if (!isMounted) return
+
+          try {
+            await videoElement.play()
+            console.log(`[SharedVideo:${videoId}] Autoplay successful`)
+            if (isMounted) {
+              setShowPlayButton(false)
+              setShowThumbnail(false)
+            }
+          } catch (playError) {
+            console.warn(`[SharedVideo:${videoId}] Autoplay failed:`, playError)
+            if (isMounted && !hidePlayButton) {
+              setShowPlayButton(true)
+            }
+          }
         }
 
-        // Mobile-friendly autoplay with proper error handling
-        if (shouldPlay && isVisible) {
-          console.log(`[SharedVideo:${videoId}] Attempting mobile-friendly autoplay`)
-
-          // Ensure video is properly muted for mobile autoplay
-          videoElement.muted = true
-
-          const attemptAutoplay = async () => {
-            try {
-              // Check if we have enough data to play
-              if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                await videoElement.play()
-                console.log(`[SharedVideo:${videoId}] Autoplay successful`)
-                setShowPlayButton(false) // Hide play button if autoplay works
-                return true
-              }
-              return false
-            } catch (playError) {
-              console.warn(`[SharedVideo:${videoId}] Auto-play failed:`, playError)
-              // On mobile, autoplay might fail - show play button for user interaction
-              if (!userInteracted) {
-                setShowPlayButton(true)
-              }
-              return false
-            }
-          }
-
-          // Try immediate play if ready
-          const playedImmediately = await attemptAutoplay()
-
-          if (!playedImmediately) {
-            // Set up event listener for when video can play
-            const handleCanPlay = async () => {
-              await attemptAutoplay()
-              videoElement.removeEventListener('canplay', handleCanPlay)
-            }
-
-            videoElement.addEventListener('canplay', handleCanPlay)
-
-            // Also try after a short delay (mobile-friendly timing)
-            setTimeout(async () => {
-              if (videoElement.paused) {
-                await attemptAutoplay()
-              }
-            }, 100)
-
-            // Fallback: show play button if video doesn't autoplay within 2 seconds
-            setTimeout(() => {
-              if (videoElement.paused && !userInteracted && autoPlay) {
-                console.log(`[SharedVideo:${videoId}] Autoplay timeout, showing play button`)
-                setShowPlayButton(true)
-              }
-            }, 2000)
-          }
+        // Try to play immediately if ready
+        if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          await playVideo()
         } else {
-          console.log(`[SharedVideo:${videoId}] Skipping autoplay - shouldPlay:`, shouldPlay, 'isVisible:', isVisible)
+          // Wait for video to be ready
+          const handleCanPlay = () => {
+            if (!controller.signal.aborted) {
+              playVideo()
+            }
+          }
+
+          videoElement.addEventListener('canplay', handleCanPlay, {
+            signal: controller.signal,
+            once: true
+          })
         }
-      } catch (initError) {
-        console.warn(`[SharedVideo:${videoId}] Video initialization failed:`, initError)
+
+      } catch (error) {
+        console.warn(`[SharedVideo:${videoId}] Video initialization failed:`, error)
       }
     }
 
-    // Small delay to ensure DOM is ready (important for mobile)
-    const timeout = setTimeout(initializeVideo, 16)
-    return () => clearTimeout(timeout)
-  }, [videoElement, shouldPlay, startTime, videoId, shouldReduceData, isVisible, autoPlay])
+    // Start initialization after a brief delay
+    const timeout = setTimeout(initializeVideo, 100)
+
+    return () => {
+      isMounted = false
+      controller.abort()
+      clearTimeout(timeout)
+    }
+  }, [videoElement, shouldPlay, startTime, videoId, isVisible, hidePlayButton])
 
   // Handle play/pause based on visibility when playOnInView is enabled
   useEffect(() => {
@@ -337,6 +334,115 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     }
   }), [videoElement, videoPlay, videoPause, videoSetTime, videoSetRate, startTime])
 
+  // Generate poster/thumbnail from video at specific time
+  const generatePoster = useCallback(async () => {
+    if (!videoElement || !canvasRef.current || !showPoster || posterUrl) return
+
+    const videoConfig = VIDEO_CONFIGS.find(config => config.id === videoId)
+    const posterTime = videoConfig?.posterTime || startTime || 0
+
+    try {
+      console.log(`[SharedVideo:${videoId}] Generating poster at time ${posterTime}`)
+
+      // Create a temporary video element for poster generation to avoid interfering with playback
+      const tempVideo = document.createElement('video')
+      tempVideo.src = videoElement.src
+      tempVideo.muted = true
+      tempVideo.crossOrigin = 'anonymous'
+
+      // Wait for temp video to load enough data
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
+
+        const handleLoadedData = () => {
+          clearTimeout(timeout)
+          tempVideo.removeEventListener('loadeddata', handleLoadedData)
+          tempVideo.removeEventListener('error', handleError)
+          resolve(void 0)
+        }
+
+        const handleError = () => {
+          clearTimeout(timeout)
+          tempVideo.removeEventListener('loadeddata', handleLoadedData)
+          tempVideo.removeEventListener('error', handleError)
+          reject(new Error('Video load error'))
+        }
+
+        tempVideo.addEventListener('loadeddata', handleLoadedData)
+        tempVideo.addEventListener('error', handleError)
+      })
+
+      // Set to poster time and capture frame
+      tempVideo.currentTime = posterTime
+
+      await new Promise((resolve) => {
+        const handleSeeked = () => {
+          tempVideo.removeEventListener('seeked', handleSeeked)
+          resolve(void 0)
+        }
+        tempVideo.addEventListener('seeked', handleSeeked)
+      })
+
+      // Generate canvas thumbnail
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      // Set canvas dimensions
+      canvas.width = tempVideo.videoWidth || 1080
+      canvas.height = tempVideo.videoHeight || 1920
+
+      // Draw video frame to canvas
+      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height)
+
+      // Convert to blob and create URL
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob)
+          setPosterUrl(url)
+          console.log(`[SharedVideo:${videoId}] Generated poster thumbnail successfully`)
+        }
+      }, 'image/jpeg', 0.8)
+
+      // Clean up temp video
+      tempVideo.remove()
+
+    } catch (error) {
+      console.warn(`[SharedVideo:${videoId}] Failed to generate poster:`, error)
+    }
+  }, [videoElement, videoId, startTime, showPoster, posterUrl])
+
+  // Generate poster when video loads - debounced to avoid React Strict Mode issues
+  useEffect(() => {
+    if (!videoElement || !showPoster || posterUrl) return
+
+    let timeoutId: NodeJS.Timeout
+
+    const attemptPosterGeneration = () => {
+      // Clear any existing timeout
+      if (timeoutId) clearTimeout(timeoutId)
+
+      // Debounce to avoid multiple calls in React Strict Mode
+      timeoutId = setTimeout(() => {
+        if (videoElement.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          generatePoster()
+        } else {
+          const handleLoadedData = () => {
+            generatePoster()
+            videoElement.removeEventListener('loadeddata', handleLoadedData)
+          }
+          videoElement.addEventListener('loadeddata', handleLoadedData, { once: true })
+        }
+      }, 200)
+    }
+
+    attemptPosterGeneration()
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [videoElement, showPoster, posterUrl, generatePoster])
+
   // Handle user interaction to play video when autoplay fails
   const handleUserPlay = useCallback(async () => {
     if (!videoElement) return
@@ -344,6 +450,7 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     try {
       setUserInteracted(true)
       setShowPlayButton(false)
+      setShowThumbnail(false) // Hide thumbnail when playing
       await videoElement.play()
       console.log(`[SharedVideo:${videoId}] User-initiated play successful`)
     } catch (error) {
@@ -390,6 +497,13 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
       className={`relative overflow-hidden ${className}`}
       style={style}
     >
+      {/* Hidden canvas for generating thumbnails */}
+      <canvas
+        ref={canvasRef}
+        className="hidden"
+        style={{ display: 'none' }}
+      />
+
       {/* Video element will be appended here dynamically */}
       {!videoElement && isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-medium-grey">
@@ -397,8 +511,20 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
         </div>
       )}
 
+      {/* Poster/thumbnail overlay */}
+      {showThumbnail && posterUrl && (
+        <div className="absolute inset-0 z-5">
+          <img
+            src={posterUrl}
+            alt={`${videoId} thumbnail`}
+            className="w-full h-full object-cover"
+            style={{ transition: 'opacity 0.3s ease-in-out' }}
+          />
+        </div>
+      )}
+
       {/* Play button overlay for when autoplay fails on mobile */}
-      {showPlayButton && videoElement && (
+      {showPlayButton && videoElement && !hidePlayButton && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
           <button
             onClick={handleUserPlay}
