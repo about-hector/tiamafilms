@@ -58,12 +58,30 @@ const V2MasonryHero = () => {
     [useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1), useMotionValue(1)], // Column 3 (index 3)
   ]
 
-  // Create blur transforms for each mobile card
-  const mobileBlurTransforms = mobileBlurValues.map(column =>
-    column.map(blurValue =>
-      useTransform(blurValue, (blur) => `blur(${blur}px)`)
-    )
-  )
+  // Create blur transforms for each mobile card - explicit declarations to avoid hook violations
+  const mobileBlurTransforms = [
+    [
+      useTransform(mobileBlurValues[0][0], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[0][1], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[0][2], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[0][3], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[0][4], (blur) => `blur(${blur}px)`)
+    ],
+    [
+      useTransform(mobileBlurValues[1][0], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[1][1], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[1][2], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[1][3], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[1][4], (blur) => `blur(${blur}px)`)
+    ],
+    [
+      useTransform(mobileBlurValues[2][0], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[2][1], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[2][2], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[2][3], (blur) => `blur(${blur}px)`),
+      useTransform(mobileBlurValues[2][4], (blur) => `blur(${blur}px)`)
+    ]
+  ]
 
   // Create opacity transforms for each mobile card (no transform needed, use motion values directly)
   const mobileOpacityTransforms = mobileOpacityValues
