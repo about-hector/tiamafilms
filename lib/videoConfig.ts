@@ -1,5 +1,6 @@
 export interface VideoQuality {
-  url: string
+  mp4: string
+  webm: string
   width: number
   height: number
   fileSize: number // in MB (approximate)
@@ -9,10 +10,11 @@ export interface VideoConfig {
   id: string
   name: string
   qualities: {
-    low: VideoQuality
-    medium: VideoQuality
-    high: VideoQuality
+    medium: VideoQuality // 720p
+    high: VideoQuality   // 1080p
   }
+  poster: string
+  thumbnail: string
   duration: number // in seconds
   aspectRatio: string
   posterTime?: number // time in seconds to use for poster/thumbnail
@@ -26,25 +28,23 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
     id: 'caroline-eran',
     name: 'Caroline Eran Wedding',
     qualities: {
-      low: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Acaroline-eran_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 50
-      },
       medium: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Acaroline-eran_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 50
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_720p-h264_75b809d9.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_720p-vp9_75b809d9.webm`,
+        width: 720,
+        height: 1280,
+        fileSize: 10
       },
       high: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Acaroline-eran_v1.mp4`,
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_1080p-h264_75b809d9.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_1080p-vp9_75b809d9.webm`,
         width: 1080,
         height: 1920,
-        fileSize: 50
+        fileSize: 27
       }
     },
+    poster: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_poster_75b809d9.jpg`,
+    thumbnail: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-caroline-eran-ig-reel_v1_thumb-540p_75b809d9.jpg`,
     duration: 30,
     aspectRatio: '9/16',
     posterTime: 12
@@ -53,25 +53,23 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
     id: 'celine-chris',
     name: 'Celine Chris Wedding',
     qualities: {
-      low: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aceline-chris_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 45
-      },
       medium: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aceline-chris_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 45
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_720p-h264_5eec8adc.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_720p-vp9_5eec8adc.webm`,
+        width: 720,
+        height: 1280,
+        fileSize: 11
       },
       high: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aceline-chris_v1.mp4`,
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_1080p-h264_5eec8adc.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_1080p-vp9_5eec8adc.webm`,
         width: 1080,
         height: 1920,
-        fileSize: 45
+        fileSize: 30
       }
     },
+    poster: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_poster_5eec8adc.jpg`,
+    thumbnail: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-celine-chris-ig-reel_v1_thumb-540p_5eec8adc.jpg`,
     duration: 32,
     aspectRatio: '9/16',
     posterTime: 8
@@ -80,25 +78,23 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
     id: 'irene-steven',
     name: 'Irene Steven Wedding',
     qualities: {
-      low: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Airene-steven_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 55
-      },
       medium: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Airene-steven_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 55
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_720p-h264_b2bd597f.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_720p-vp9_b2bd597f.webm`,
+        width: 720,
+        height: 1280,
+        fileSize: 8
       },
       high: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Airene-steven_v1.mp4`,
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_1080p-h264_b2bd597f.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_1080p-vp9_b2bd597f.webm`,
         width: 1080,
         height: 1920,
-        fileSize: 55
+        fileSize: 21
       }
     },
+    poster: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_poster_b2bd597f.jpg`,
+    thumbnail: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-irene-steven-ig-reel_v1_thumb-540p_b2bd597f.jpg`,
     duration: 35,
     aspectRatio: '9/16',
     posterTime: 15
@@ -107,25 +103,23 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
     id: 'kirstie-kyle',
     name: 'Kirstie Kyle Wedding',
     qualities: {
-      low: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Akirstie-kyle_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 48
-      },
       medium: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Akirstie-kyle_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 48
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_720p-h264_68be2a46.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_720p-vp9_68be2a46.webm`,
+        width: 720,
+        height: 1280,
+        fileSize: 11
       },
       high: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Akirstie-kyle_v1.mp4`,
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_1080p-h264_68be2a46.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_1080p-vp9_68be2a46.webm`,
         width: 1080,
         height: 1920,
-        fileSize: 48
+        fileSize: 30
       }
     },
+    poster: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_poster_68be2a46.jpg`,
+    thumbnail: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-kirstie-kyle-ig-reel_v1_thumb-540p_68be2a46.jpg`,
     duration: 28,
     aspectRatio: '9/16',
     posterTime: 5
@@ -134,25 +128,23 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
     id: 'roxanna-james',
     name: 'Roxanna James Wedding',
     qualities: {
-      low: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aroxanna-james_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 52
-      },
       medium: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aroxanna-james_v1.mp4`,
-        width: 1080,
-        height: 1920,
-        fileSize: 52
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_720p-h264_a45631e5.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_720p-vp9_a45631e5.webm`,
+        width: 720,
+        height: 1280,
+        fileSize: 10
       },
       high: {
-        url: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms%3A2025%3Aig-reel%3Aroxanna-james_v1.mp4`,
+        mp4: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_1080p-h264_a45631e5.mp4`,
+        webm: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_1080p-vp9_a45631e5.webm`,
         width: 1080,
         height: 1920,
-        fileSize: 52
+        fileSize: 29
       }
     },
+    poster: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_poster_a45631e5.jpg`,
+    thumbnail: `${CLOUDFLARE_R2_BASE_URL}/tiamafilms/videos/2025/unknown-roxanna-james-ig-reel_v1_thumb-540p_a45631e5.jpg`,
     duration: 33,
     aspectRatio: '9/16',
     posterTime: 20
@@ -160,7 +152,7 @@ export const VIDEO_CONFIGS: VideoConfig[] = [
 ]
 
 // Quality selection based on connection and device capabilities
-export type QualityLevel = 'low' | 'medium' | 'high'
+export type QualityLevel = 'medium' | 'high'
 
 export interface ConnectionInfo {
   effectiveType: 'slow-2g' | '2g' | '3g' | '4g' | undefined
@@ -172,26 +164,29 @@ export interface ConnectionInfo {
 export function getOptimalQuality(
   connection: ConnectionInfo,
   isVisible: boolean,
-  devicePixelRatio: number = 1
+  devicePixelRatio: number = 1,
+  isMobile: boolean = false
 ): QualityLevel {
-  // Always start with low quality if user has save-data enabled
-  if (connection.saveData) return 'low'
+  // Always use medium quality if user has save-data enabled
+  if (connection.saveData) return 'medium'
 
-  // For slow connections, prioritize performance
+  // Mobile devices get 720p (medium quality) for better performance
+  if (isMobile) return 'medium'
+
+  // For slow connections, use medium quality
   if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
-    return 'low'
+    return 'medium'
   }
 
   if (connection.effectiveType === '3g') {
-    return isVisible ? 'medium' : 'low'
+    return isVisible ? 'medium' : 'medium'
   }
 
   // For fast connections (4g or undefined), consider device capabilities
-  if (connection.downlink < 2) return 'low'
-  if (connection.downlink < 5) return 'medium'
+  if (connection.downlink < 3) return 'medium'
 
-  // High-end devices with good connections get high quality
-  if (devicePixelRatio >= 2 && connection.downlink >= 5) {
+  // Desktop with good connections get high quality (1080p)
+  if (!isMobile && devicePixelRatio >= 1 && connection.downlink >= 3) {
     return isVisible ? 'high' : 'medium'
   }
 
@@ -202,4 +197,41 @@ export function getTotalDownloadSize(quality: QualityLevel): number {
   return VIDEO_CONFIGS.reduce((total, config) => {
     return total + config.qualities[quality].fileSize
   }, 0)
+}
+
+// WebM support detection
+export function supportsWebM(): boolean {
+  if (typeof window === 'undefined') return false
+
+  const video = document.createElement('video')
+  return !!(video.canPlayType && video.canPlayType('video/webm; codecs="vp9"').replace(/no/, ''))
+}
+
+// Get optimal video URL with format priority
+export function getOptimalVideoUrl(
+  videoConfig: VideoConfig,
+  quality: QualityLevel
+): string {
+  const qualityConfig = videoConfig.qualities[quality]
+
+  // Prioritize WebM if supported, fallback to MP4
+  if (supportsWebM()) {
+    return qualityConfig.webm
+  }
+
+  return qualityConfig.mp4
+}
+
+// Get poster or thumbnail based on device type
+export function getPosterUrl(
+  videoConfig: VideoConfig,
+  isMobile: boolean = false
+): string {
+  return isMobile ? videoConfig.thumbnail : videoConfig.poster
+}
+
+// Mobile device detection utility
+export function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }

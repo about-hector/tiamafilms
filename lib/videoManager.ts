@@ -1,6 +1,6 @@
 'use client'
 
-import { VIDEO_CONFIGS, VideoConfig, QualityLevel, getOptimalQuality, ConnectionInfo } from './videoConfig'
+import { VIDEO_CONFIGS, VideoConfig, QualityLevel, getOptimalQuality, ConnectionInfo, getOptimalVideoUrl, isMobileDevice } from './videoConfig'
 
 export interface VideoCache {
   id: string
@@ -172,10 +172,11 @@ class VideoManagerClass {
       const optimalQuality = getOptimalQuality(
         this.connectionInfo,
         false, // Not necessarily visible during preload
-        window.devicePixelRatio
+        window.devicePixelRatio,
+        isMobileDevice()
       )
 
-      const videoUrl = config.qualities[optimalQuality].url
+      const videoUrl = getOptimalVideoUrl(config, optimalQuality)
       console.log('[VideoManager] Downloading video blob for', videoId)
       console.log('[VideoManager] Video URL:', videoUrl)
 
@@ -287,10 +288,11 @@ class VideoManagerClass {
     const optimalQuality = getOptimalQuality(
       this.connectionInfo,
       true,
-      typeof window !== 'undefined' ? window.devicePixelRatio : 1
+      typeof window !== 'undefined' ? window.devicePixelRatio : 1,
+      typeof window !== 'undefined' ? isMobileDevice() : false
     )
 
-    return config.qualities[optimalQuality].url
+    return getOptimalVideoUrl(config, optimalQuality)
   }
 
   // Get object URL for cached video blob (for optimized playback after preload)
@@ -372,10 +374,9 @@ class VideoManagerClass {
     return video
   }
 
-  // Helper to detect mobile devices
+  // Helper to detect mobile devices (using imported utility)
   private isMobileDevice(): boolean {
-    if (typeof window === 'undefined') return false
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    return isMobileDevice()
   }
 
   // Cleanup old object URLs to prevent memory leaks

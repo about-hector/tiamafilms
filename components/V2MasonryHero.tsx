@@ -122,39 +122,46 @@ const V2MasonryHero = () => {
       return Math.max(0, baseStartTime + variation) // Ensure we don't go negative
     }
 
-    // Use all 5 videos in each column with varied start times
-    return [
-      {
-        videoId: videoIds[0], // caroline-eran
-        startTime: getVariedStartTime(videoStartTimes[0], 0, columnIndex),
-        cardIndex: 0,
-        columnIndex
-      },
-      {
-        videoId: videoIds[1], // celine-chris
-        startTime: getVariedStartTime(videoStartTimes[1], 1, columnIndex),
-        cardIndex: 1,
-        columnIndex
-      },
-      {
-        videoId: videoIds[2], // irene-steven
-        startTime: getVariedStartTime(videoStartTimes[2], 2, columnIndex),
-        cardIndex: 2,
-        columnIndex
-      },
-      {
-        videoId: videoIds[3], // kirstie-kyle
-        startTime: getVariedStartTime(videoStartTimes[3], 3, columnIndex),
-        cardIndex: 3,
-        columnIndex
-      },
-      {
-        videoId: videoIds[4], // roxanna-james
-        startTime: getVariedStartTime(videoStartTimes[4], 4, columnIndex),
-        cardIndex: 4,
-        columnIndex
+    // Create different video orders for each column to avoid grid-like repetition
+    const getColumnSpecificVideoOrder = (columnIndex: number) => {
+      const shuffledIds = [...videoIds]
+      const shuffledStartTimes = [...videoStartTimes]
+
+      // Use column index as seed for consistent but different ordering per column
+      // This ensures each column has a different arrangement
+      switch (columnIndex) {
+        case 1: // Column 1: rotate by 1
+          return {
+            ids: [shuffledIds[1], shuffledIds[2], shuffledIds[3], shuffledIds[4], shuffledIds[0]],
+            times: [shuffledStartTimes[1], shuffledStartTimes[2], shuffledStartTimes[3], shuffledStartTimes[4], shuffledStartTimes[0]]
+          }
+        case 2: // Column 2: rotate by 2
+          return {
+            ids: [shuffledIds[2], shuffledIds[3], shuffledIds[4], shuffledIds[0], shuffledIds[1]],
+            times: [shuffledStartTimes[2], shuffledStartTimes[3], shuffledStartTimes[4], shuffledStartTimes[0], shuffledStartTimes[1]]
+          }
+        case 3: // Column 3: rotate by 3
+          return {
+            ids: [shuffledIds[3], shuffledIds[4], shuffledIds[0], shuffledIds[1], shuffledIds[2]],
+            times: [shuffledStartTimes[3], shuffledStartTimes[4], shuffledStartTimes[0], shuffledStartTimes[1], shuffledStartTimes[2]]
+          }
+        default: // Column 0 and others: keep original order
+          return {
+            ids: shuffledIds,
+            times: shuffledStartTimes
+          }
       }
-    ]
+    }
+
+    const { ids: columnVideoIds, times: columnStartTimes } = getColumnSpecificVideoOrder(columnIndex)
+
+    // Use scattered video order for this column
+    return columnVideoIds.map((videoId, index) => ({
+      videoId,
+      startTime: getVariedStartTime(columnStartTimes[index], index, columnIndex),
+      cardIndex: index,
+      columnIndex
+    }))
   }
 
 
