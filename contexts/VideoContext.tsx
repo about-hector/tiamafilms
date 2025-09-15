@@ -76,6 +76,41 @@ export function useVideoElement(videoId: string, isVisible: boolean = true) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pageVisible, setPageVisible] = useState(true)
+
+  // Track page visibility to reload videos when page becomes visible again
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleVisibilityChange = () => {
+      const isVisible = !document.hidden
+      console.log(`[useVideoElement:${videoId}] Page visibility changed:`, isVisible)
+      setPageVisible(isVisible)
+    }
+
+    // Add page visibility listener
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Also listen for page show/hide events (iOS Safari)
+    const handlePageShow = () => {
+      console.log(`[useVideoElement:${videoId}] Page shown`)
+      setPageVisible(true)
+    }
+
+    const handlePageHide = () => {
+      console.log(`[useVideoElement:${videoId}] Page hidden`)
+      setPageVisible(false)
+    }
+
+    window.addEventListener('pageshow', handlePageShow)
+    window.addEventListener('pagehide', handlePageHide)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('pagehide', handlePageHide)
+    }
+  }, [videoId])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -83,7 +118,7 @@ export function useVideoElement(videoId: string, isVisible: boolean = true) {
     try {
       setIsLoading(true)
       setError(null)
-      console.log(`[useVideoElement:${videoId}] Getting video URL`)
+      console.log(`[useVideoElement:${videoId}] Getting video URL (pageVisible: ${pageVisible})`)
 
       // Get direct URL - no blob caching needed for immutable assets
       const directUrl = getDirectVideoUrl(videoId)
@@ -102,7 +137,7 @@ export function useVideoElement(videoId: string, isVisible: boolean = true) {
       setVideoUrl(null)
       setIsLoading(false)
     }
-  }, [videoId, getDirectVideoUrl])
+  }, [videoId, getDirectVideoUrl, pageVisible]) // Re-run when page becomes visible
 
   return {
     videoUrl,

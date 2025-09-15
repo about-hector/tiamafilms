@@ -180,14 +180,14 @@ const V2MasonryHero = () => {
         const fadeZone = cardHeight * 0.4
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < fadeZone) {
           const fadeProgress = minDistance / fadeZone
-          return Math.max(0.2, fadeProgress)
+          return Math.max(0.6, fadeProgress)
         }
         return 1
       }),
@@ -198,14 +198,14 @@ const V2MasonryHero = () => {
         const blurZone = cardHeight * 0.3
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < blurZone) {
           const blurProgress = 1 - (minDistance / blurZone)
-          const blurAmount = blurProgress * 8
+          const blurAmount = blurProgress * 3
           return `blur(${blurAmount}px)`
         }
         return 'blur(0px)'
@@ -223,14 +223,14 @@ const V2MasonryHero = () => {
         const fadeZone = cardHeight * 0.4
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < fadeZone) {
           const fadeProgress = minDistance / fadeZone
-          return Math.max(0.2, fadeProgress)
+          return Math.max(0.6, fadeProgress)
         }
         return 1
       }),
@@ -241,14 +241,14 @@ const V2MasonryHero = () => {
         const blurZone = cardHeight * 0.3
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < blurZone) {
           const blurProgress = 1 - (minDistance / blurZone)
-          const blurAmount = blurProgress * 8
+          const blurAmount = blurProgress * 3
           return `blur(${blurAmount}px)`
         }
         return 'blur(0px)'
@@ -266,14 +266,14 @@ const V2MasonryHero = () => {
         const fadeZone = cardHeight * 0.4
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < fadeZone) {
           const fadeProgress = minDistance / fadeZone
-          return Math.max(0.2, fadeProgress)
+          return Math.max(0.6, fadeProgress)
         }
         return 1
       }),
@@ -284,14 +284,14 @@ const V2MasonryHero = () => {
         const blurZone = cardHeight * 0.3
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < blurZone) {
           const blurProgress = 1 - (minDistance / blurZone)
-          const blurAmount = blurProgress * 8
+          const blurAmount = blurProgress * 3
           return `blur(${blurAmount}px)`
         }
         return 'blur(0px)'
@@ -309,14 +309,14 @@ const V2MasonryHero = () => {
         const fadeZone = cardHeight * 0.4
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < fadeZone) {
           const fadeProgress = minDistance / fadeZone
-          return Math.max(0.2, fadeProgress)
+          return Math.max(0.6, fadeProgress)
         }
         return 1
       }),
@@ -327,14 +327,14 @@ const V2MasonryHero = () => {
         const blurZone = cardHeight * 0.3
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < blurZone) {
           const blurProgress = 1 - (minDistance / blurZone)
-          const blurAmount = blurProgress * 8
+          const blurAmount = blurProgress * 3
           return `blur(${blurAmount}px)`
         }
         return 'blur(0px)'
@@ -352,14 +352,14 @@ const V2MasonryHero = () => {
         const fadeZone = cardHeight * 0.4
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < fadeZone) {
           const fadeProgress = minDistance / fadeZone
-          return Math.max(0.2, fadeProgress)
+          return Math.max(0.6, fadeProgress)
         }
         return 1
       }),
@@ -370,14 +370,14 @@ const V2MasonryHero = () => {
         const blurZone = cardHeight * 0.3
         const maxBound = viewportHeight * 0.3 + cardHeight * 0.1
         const minBound = -(viewportHeight * 0.3 + cardHeight * 0.1)
-        
+
         const distanceFromTop = currentY - minBound
         const distanceFromBottom = maxBound - currentY
         const minDistance = Math.min(distanceFromTop, distanceFromBottom)
-        
+
         if (minDistance < blurZone) {
           const blurProgress = 1 - (minDistance / blurZone)
-          const blurAmount = blurProgress * 8
+          const blurAmount = blurProgress * 3
           return `blur(${blurAmount}px)`
         }
         return 'blur(0px)'
@@ -674,7 +674,7 @@ const V2MasonryHero = () => {
                         <SharedVideo
                           videoId={video.videoId}
                           className="w-full h-full object-cover rounded-xl"
-                          autoPlay={true}
+                          playOnInView={true}
                           muted
                           loop
                           controls={false}
@@ -750,7 +750,7 @@ const V2MasonryHero = () => {
                       <SharedVideo
                         videoId={videoIds[columnIndex]}
                         className="w-full h-full object-cover rounded-xl"
-                        autoPlay={true}
+                        playOnInView={true}
                         muted
                         loop
                         controls={false}
