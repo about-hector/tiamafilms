@@ -138,15 +138,21 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     videoElement.controls = controls
     videoElement.playsInline = true
 
-    // Critical mobile video attributes
+    // Critical mobile video attributes - set multiple times to ensure iOS compliance
     videoElement.setAttribute('webkit-playsinline', 'true')
     videoElement.setAttribute('playsinline', 'true')
     videoElement.setAttribute('preload', 'metadata')
+    videoElement.setAttribute('autoplay', autoPlay ? 'true' : 'false')
+
+    // Force mobile attributes multiple ways for iOS reliability
+    videoElement.webkitPlaysinline = true
+    videoElement.playsInline = true
 
     // Ensure muted for autoplay compliance on mobile
     if (autoPlay) {
       videoElement.muted = true
       videoElement.setAttribute('muted', 'true')
+      videoElement.setAttribute('autoplay', 'true')
     }
 
     // Append to our container - use a more React-friendly approach
@@ -219,9 +225,15 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
         // Set start time immediately
         videoElement.currentTime = startTime
 
-        // Ensure proper settings for autoplay
+        // Ensure proper settings for autoplay - reapply mobile attributes
         videoElement.muted = true
         videoElement.playsInline = true
+        videoElement.setAttribute('webkit-playsinline', 'true')
+        videoElement.setAttribute('playsinline', 'true')
+        videoElement.setAttribute('muted', 'true')
+        if (autoPlay) {
+          videoElement.setAttribute('autoplay', 'true')
+        }
 
         // Simple autoplay attempt
         const playVideo = async () => {
@@ -279,6 +291,13 @@ export const SharedVideo = forwardRef<SharedVideoRef, SharedVideoProps>(({
     if (!videoElement || !playOnInView) return
 
     if (isInView) {
+      // Reapply mobile attributes when video comes into view (in case they were lost)
+      videoElement.setAttribute('webkit-playsinline', 'true')
+      videoElement.setAttribute('playsinline', 'true')
+      videoElement.setAttribute('muted', 'true')
+      videoElement.muted = true
+      videoElement.playsInline = true
+
       if (videoElement.paused) {
         console.log(`[SharedVideo:${videoId}] Playing video due to in-view`)
         videoElement.play().catch(err => {
